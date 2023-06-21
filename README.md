@@ -62,3 +62,25 @@ Eklentinin nasıl çalıştığını özetlemek gerekirse:
 Sonuç olarak, tarayıcıda `http://localhost:3000/my_plugin` adresine gidildiğinde, `MyController` sınıfındaki `index` aksiyonu çalışır ve mesaj içeren `index.html.erb` görünümü gösterilir.
 
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/cd657009-2d0b-44d4-a459-e3cd9cf8aa21)
+
+
+# Menüye Eklentiyi Bağlantı Olarak Eklemek (2.0)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/aa3deb32-3953-4e0f-ab69-3414ceacee8a)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/ebd5bb60-e468-4c64-8dc3-462daff1edff)
+
+
+```
+root@9353c2bdab4a:/usr/src/redmine# bundle exec rails generate redmine_plugin_controller my_plugin denetleyici index getir gotur
+      create  plugins/my_plugin/app/controllers/denetleyici_controller.rb
+      create  plugins/my_plugin/app/helpers/denetleyici_helper.rb
+      create  plugins/my_plugin/test/functional/denetleyici_controller_test.rb
+      create  plugins/my_plugin/app/views/denetleyici/index.html.erb
+      create  plugins/my_plugin/app/views/denetleyici/getir.html.erb
+      create  plugins/my_plugin/app/views/denetleyici/gotur.html.erb
+```
+
+Projeler bağlantısına tıklayınca eklentinin menüde olduğunu göreceksiniz.
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/03df9553-fc6a-465b-b37a-0c9bb5a7dd5f)
