@@ -1,0 +1,2 @@
+module DenetleyiciHelper
+end
