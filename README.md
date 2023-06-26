@@ -84,3 +84,85 @@ root@9353c2bdab4a:/usr/src/redmine# bundle exec rails generate redmine_plugin_co
 Projeler bağlantısına tıklayınca eklentinin menüde olduğunu göreceksiniz.
 
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/03df9553-fc6a-465b-b37a-0c9bb5a7dd5f)
+
+
+# Issue sayfasına view_issues_show_details_bottom isimli hook ile Eklenti Geliştirmek (3.0)
+
+Hook'lar, eklentinizin işlevselliğini Redmine çekirdeğine entegre etmek için kullanılır ve farklı noktalarda çalışan işlevlere izin verir. Bu sayede Redmine'in farklı bölümlerinde (örneğin, proje görünümü, issue ekranı, kullanıcı profili vb.) özelleştirmeler yapabilirsiniz.
+
+Redmine eklentilerinde hook'ları konumlandırmak için genellikle `init.rb` veya `lib/my_plugin.rb` dosyaları kullanılır. Bu dosyalar, eklentinin başlatıldığı veya yüklenildiği zamanlarda çalışacak kodları içerir.
+
+
+`lib/my_plugin.rb` dosyasında hook kullanımı şu şekildedir:
+
+```ruby
+module MyPlugin
+  module Hooks
+    class ViewIssuesShowDetailsBottomHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_issues_show_details_bottom,
+        :partial => 'hooks/issues/view_issues_form_details_bottom',
+        :layout => false
+      )
+    end
+    class ViewIssuesShowSidebarBottomHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_issues_show_sidebar_bottom,
+        :partial => 'hooks/issues/view_issues_show_sidebar_bottom',
+        :layout => false
+      )
+    end
+    
+    class ViewIssuesShowDescriptionBottomHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_issues_show_description_bottom,
+        :partial => 'hooks/issues/view_issues_show_description_bottom',
+        :layout => false
+      )
+    end
+    
+    class ViewIssuesContextMenuEndHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_issues_context_menu_end,
+        :partial => 'hooks/issues/view_issues_context_menu_end',
+        :layout => false
+      )
+    end
+    
+    class ViewLayoutsBaseSidebarHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_layouts_base_sidebar,
+        :partial => 'hooks/layouts/view_layouts_base_sidebar',
+        :layout => false
+      )
+    end
+    
+    class ViewProjectsShowSidebarBottomHook < Redmine::Hook::ViewListener
+      include Redmine::I18n
+      render_on(
+        :view_projects_show_sidebar_bottom,
+        :partial => 'hooks/projects/view_projects_show_sidebar_bottom',
+        :layout => false
+      )
+    end
+  end
+end
+```
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/bd340afc-d01e-4673-9bf7-cefdcf8e8639)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/8676f918-355e-4a7f-a6b7-3a38bdcd05c8)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/ad4535f9-1fa8-413c-abff-b876775aebed)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/71c64ef7-0d83-4eaf-9f22-956d4eb7d157)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/113cedf1-2167-4f82-a502-728cf384fd1f)
+
+
+
