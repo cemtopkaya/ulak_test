@@ -165,4 +165,13 @@ end
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/113cedf1-2167-4f82-a502-728cf384fd1f)
 
 
+# Çalışan en basit eklenti (4.0)
+
+Bir eklenti ile bu kez <HEAD> etiketine CSS ve JS dosyalarını iliştirecek şekilde issue altında "Test Results" başlıklı bir sekme oluşturuyoruz
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/dccd8f37-8af3-4a18-b9e5-cdd5ebb5f3ed)
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/5cf6eeb4-c5a9-47bf-ade7-7bba840fa943)
+
+
 
