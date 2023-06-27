@@ -102,3 +102,28 @@ Running migration: CreateTestsAndIssueTestsTables
    -> 0.0668s
 == 20230627140000 CreateTestsAndIssueTestsTables: migrated (0.1526s) ==========
 ```
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/06efa830-e09b-44c9-a630-939eb9125cc7)
+
+
+
+
+```ruby
+    create_table :issue_tests do |t|
+      t.references :issue, index: true
+      t.references :test, index: true
+      t.timestamps
+    end
+```
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/6a16bf14-056c-470e-aecd-ccf3eeed7c5c)
+
+```ruby
+    create_table :tests do |t|
+      t.string :test_name
+      t.integer :product_id
+      t.timestamp :create_date
+      t.timestamp :last_retrieve_date
+      t.timestamps
+    end
+```
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/728cbb5a-565d-430f-8a7d-b64178562819)
