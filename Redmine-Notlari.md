@@ -107,7 +107,6 @@ Running migration: CreateTestsAndIssueTestsTables
 
 
 
-
 ```ruby
     create_table :issue_tests do |t|
       t.references :issue, index: true
@@ -127,3 +126,40 @@ Running migration: CreateTestsAndIssueTestsTables
     end
 ```
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/728cbb5a-565d-430f-8a7d-b64178562819)
+
+Anlaşılan `create_date` ve `last_retrieve_date` alanlarına `t.timestamps` sayesinde gerek kalmıyor. Çünkü otomatik olarak `created_at` ve `updated_at` alanlarını otomatik ekliyor. 
+
+O halde gereksiz alanları kaldırmak için bir migration dosyası daha ekleyelim.
+
+```ruby
+# my_plugin/db/migrate/20230701090000_remove_columns_from_tests.rb
+
+class RemoveColumnsFromTests < ActiveRecord::Migration[5.2]
+    def up
+      remove_column :tests, :create_date
+      remove_column :tests, :last_retrieve_date
+    end
+  
+    def down
+      add_column :tests, :create_date, :timestamp
+      add_column :tests, :last_retrieve_date, :timestamp
+    end
+  end
+```
+
+Ve çalıştıralım:
+
+```shell
+root@25794971d4b4:/usr/src/redmine/plugins/my_plugin# bundle exec rake redmine:plugins:migrate NAME=my_plugin RAILS_ENV=production
+(in /usr/src/redmine)
+W, [2023-06-27T18:36:21.012906 #107304]  WARN -- : Creating scope :system. Overwriting existing method Enumeration.system.
+W, [2023-06-27T18:36:21.115684 #107304]  WARN -- : Creating scope :sorted. Overwriting existing method User.sorted.
+W, [2023-06-27T18:36:21.436836 #107304]  WARN -- : Creating scope :visible. Overwriting existing method Principal.visible.
+I, [2023-06-27T18:36:22.470574 #107304]  INFO -- : Migrating to RemoveColumnsFromTests (20230701090000)
+== 20230701090000 RemoveColumnsFromTests: migrating ===========================
+-- remove_column(:tests, :create_date)
+   -> 0.0773s
+-- remove_column(:tests, :last_retrieve_date)
+   -> 0.1296s
+== 20230701090000 RemoveColumnsFromTests: migrated (0.2071s) ==================
+```
