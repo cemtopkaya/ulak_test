@@ -1,5 +1,89 @@
 # redmine_plugin_1
 
+Redmine docker içinde aşağıdaki compose.yml ile çalışıyor ve içine VS Code ile debug için bir paket `gem install ruby-debug-ide` ve eklenti kuruyoruz.
+
+```yaml
+version: '3.1'
+
+networks:
+  redmine_kiwi_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 20.0.2.0/24
+          gateway: 20.0.2.1
+    
+services:
+  redmine:
+    build: .
+    container_name: redmine_kiwi
+    pull_policy: if_not_present
+    image: redmine:5.0.2-custom
+    restart: always
+    entrypoint: "tail -f /dev/null && ./docker-entrypoint.sh rails server -b 0.0.0.0"
+
+    networks:
+      redmine_kiwi_network:
+
+    ports:
+      - 96:3000
+
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_USERNAME: root
+      REDMINE_DB_PASSWORD: admin
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_SECRET_KEY_BASE: admin
+    volumes:
+      - ./volume/redmine/redmine-plugins:/usr/src/redmine/plugins
+      - ./volume/redmine/repos:/home/redmine/repos ###
+      - ./volume/redmine/redmine-themes:/usr/src/redmine/public/themes
+      - ./volume/redmine/redmine-data:/usr/src/redmine/files
+      - ./volume/redmine/redmine-logs:/usr/src/redmine/log
+      - ./volume/redmine/redmine-config/configuration.yml:/usr/src/redmine/config/configuration.yml
+#      - ./volume/redmine/redmine-config/additional_environment.rb:/usr/src/redmine/config/additional_environment.rb
+      - ./volume/redmine/plantuml/plantuml.sh:/usr/bin/plantuml.sh:z
+      - ./volume/redmine/plantuml/plantuml-1.2022.7.jar:/home/redmine/plantuml.jar:z
+    depends_on:
+      - db
+
+  db:
+    container_name: redmine_mysql_kiwi
+    image: mysql:5.7
+    restart: always
+    networks:
+      redmine_kiwi_network:
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: redmine
+      MYSQL_USER: admin
+
+    ports:
+      - 3326:3306
+
+    volumes:
+      - ./volume/mysql/mysql-data:/var/lib/mysql
+      - ./volume/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+Yukarıdaki Redmine yansısı için aşağıdakir Dockerfile kullanılacak:
+
+```Dockerfile
+FROM redmine:5.0.2
+
+RUN apt update && apt install -y \
+    graphviz vim unzip iputils-ping htop net-tools
+
+RUN apt install -y ubuntu-dev-tools
+
+# libreoffice yüklenince dmsf inline editing yapabilecek
+RUN apt install -y libreoffice liblibreoffice-java
+
+# dms eklentisinin belgeleri endekleme araclari (indexing tools):
+RUN apt-get install -y xapian-omega ruby-xapian libxapian-dev poppler-utils antiword  unzip catdoc libwpd-tools \
+libwps-tools gzip unrtf catdvi djview djview3 uuid uuid-dev xz-utils libemail-outlook-message-perl
+```
+
 İlk redmine eklentim
 
 # Çalışan en basit eklenti (1.0)
