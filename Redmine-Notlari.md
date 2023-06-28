@@ -163,3 +163,7 @@ I, [2023-06-27T18:36:22.470574 #107304]  INFO -- : Migrating to RemoveColumnsFro
    -> 0.1296s
 == 20230701090000 RemoveColumnsFromTests: migrated (0.2071s) ==================
 ```
+
+Ve sonuç:
+
+![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/f42b48dd-c46f-45d9-bf6e-eb54d68375c9)
