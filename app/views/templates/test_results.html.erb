@@ -1,3 +1,25 @@
-<h1 class="sablon_basligi">JSON Verisi:</h1>
+<%
+=begin%>
+ <h1 class="sablon_basligi">Testler</h1>
 <p>name 1: <%= @data[:content] %></p>
-<p>type 2: <%= @data[:created_at] %></p>
+<p>type 2: <%= @data[:created_at] %></p> 
+<%
+=end%>
+
+<div class="box filedroplistner">
+    <fieldset class="tabular">
+        <legend>Testler</legend>
+        <div id="all_attributes">
+            <p>
+                <label for="issue_subject">Test Kodları</label>
+                <input size="80" maxlength="255" type="text" value="" name="issue[subject]" id="issue_subject">
+            </p>
+        </div>
+        <div id="all_attributes">
+            <p>
+                <%= form.label :test_name %>
+                <%= form.text_field :test_name, id: 'test_name_input', data: { source: autocomplete_tests_path } %>
+            </p>
+        </div>
+    </fieldset>
+</div>

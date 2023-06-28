@@ -21,6 +21,24 @@ $(document).ready(function () {
     }).html('test sonuçları içerik').appendTo($history);
 })
 
+$(document).ready(function() {
+    $('#test_name_input').select2({
+      minimumInputLength: 1,
+      ajax: {
+        url: '<%= autocomplete_tests_path %>',
+        dataType: 'json',
+        delay: 250,
+        processResults: function(data) {
+          return {
+            results: data
+          };
+        },
+        cache: true
+      }
+    });
+  });
+  
+
 function cem() {
     var topmenu = document.getElementById("top-menu");
     var divdark = document.createElement("div");
