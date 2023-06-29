@@ -22,7 +22,8 @@ services:
     pull_policy: if_not_present
     image: redmine:5.0.2-custom
     restart: always
-    entrypoint: "tail -f /dev/null && ./docker-entrypoint.sh rails server -b 0.0.0.0"
+    entrypoint: "/docker-entrypoint.sh rails server -b 0.0.0.0"
+    #entrypoint: "tail -f /dev/null && ./docker-entrypoint.sh rails server -b 0.0.0.0"
 
     networks:
       redmine_kiwi_network:
