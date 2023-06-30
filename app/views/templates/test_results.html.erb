@@ -16,10 +16,14 @@
             </p>
         </div>
         <div id="all_attributes">
-            <p>
+            <%
+=begin%>
+ <p>
                 <%= form.label :test_name %>
                 <%= form.text_field :test_name, id: 'test_name_input', data: { source: autocomplete_tests_path } %>
-            </p>
+            </p> 
+<%
+=end%>
         </div>
     </fieldset>
 </div>

@@ -148,6 +148,11 @@ class RemoveColumnsFromTests < ActiveRecord::Migration[5.2]
 ```
 
 Ve çalıştıralım:
+```shell
+bundle exec rake redmine:plugins:migrate NAME=my_plugin RAILS_ENV=production
+```
+
+çıktısı:
 
 ```shell
 root@25794971d4b4:/usr/src/redmine/plugins/my_plugin# bundle exec rake redmine:plugins:migrate NAME=my_plugin RAILS_ENV=production

@@ -7,8 +7,6 @@ class CreateTestsAndIssueTestsTables < ActiveRecord::Migration[5.2]
     create_table :tests do |t|
       t.string :test_name
       t.integer :product_id
-      t.timestamp :create_date
-      t.timestamp :last_retrieve_date
       t.timestamps
     end
 
