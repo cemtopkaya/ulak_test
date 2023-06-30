@@ -1,4 +1,6 @@
-# redmine_plugin_1
+# Redmine Eklentisi Geliştirmek
+
+Eklentiyi `/usr/src/redmine/plugins` dizininde, `git clone https://github.com/cemtopkaya/my_plugin.git` komutu ile çekebilir, `bundle exec rake redmine:plugins:migrate NAME=my_plugin RAILS_ENV=production` komutuyla veritabanı değişimlerini oluşturabilirsiniz.
 
 Redmine docker içinde aşağıdaki compose.yml ile çalışıyor ve içine VS Code ile debug için bir paket `gem install ruby-debug-ide` ve eklenti kuruyoruz.
 
@@ -20,7 +22,8 @@ services:
     pull_policy: if_not_present
     image: redmine:5.0.2-custom
     restart: always
-    entrypoint: "tail -f /dev/null && ./docker-entrypoint.sh rails server -b 0.0.0.0"
+    entrypoint: "/docker-entrypoint.sh rails server -b 0.0.0.0"
+    #entrypoint: "tail -f /dev/null && ./docker-entrypoint.sh rails server -b 0.0.0.0"
 
     networks:
       redmine_kiwi_network:
