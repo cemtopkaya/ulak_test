@@ -1,38 +1,44 @@
-$(document).ready(function () {
-  console.log("my_plugin.js");
-  var $history = $("#history")
-  var $ul = $history.find("div.tabs ul")
-  // var $li = $("<li><a id=\"tab-test_results\" class=\"selected\" onclick=\"getRemoteTab('test_results', '/issues/1448/tab/cem_entries', '/issues/1448?tab=test_results'); return false;\" href=\"/issues/1448?tab=test_results\">Test Results</a></li>")
-  $("<li>").html(
-    $("<a />", {
-      id: "tab-test_results",
-      class: "",
-      onclick: "getRemoteTab('test_results', '/my_plugin/1', '/issues/1?tab=test_results'); return false;",
-      href: "/issues/1?tab=test_results",
-      text: "Test Results"
-    })
-  ).appendTo($ul)
+console.log("my_plugin.js");
 
-  // $tags = $('<select multiple="multiple" class="form-control" id="test_name_input" style="width: 400px;"  data-minimum-results-for-search="Infinity"></select>');
-  $tests = $('<select />', {
-    multiple: "multiple",
-    class: "form-control",
-    id: "test_name_input",
-    style: "width: 400px;",
-    "data-minimum-results-for-search": "Infinity"
+function my_plugin() {
+  let issueId = issueData.issue_id
+
+  // function getRemoteTab(name, remote_url, url, load_always) {
+  let name = 'test_results'
+  remote_url = `/my_plugin/${issueId}/tab/test_results`;
+  url = `/issues/${issueId}?tab=test_results`;
+  // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
+  let $tabTestResultHeader = $("<a />", {
+    id: "tab-test_results",
+    class: "",
+    onclick: `getRemoteTab('${name}', '${remote_url}', '${url}'); return false;`,
+    href: `/issues/${issueId}?tab=test_results`,
+    text: "Test Results"
   });
 
-  var $testContent = $('<div>', {
+  let $history = $("#history")
+  let $history_ul = $history.find("div.tabs ul")
+  $("<li>").html($tabTestResultHeader).appendTo($history_ul)
+
+  // Testleri SELECT2 içinde gösterelim
+  let $selectTests = $('<select />', {
+    multiple: 'multiple',
+    class: 'form-control',
+    id: 'test_name_input',
+    style: 'width: 400px;',
+    'data-minimum-results-for-search': 'Infinity'
+  });
+
+  let $tabContentTests = $('<div>', {
     id: 'tab-content-test_results',
     class: 'tab-content',
     title: 'Test results will be displayed in this section',
     style: 'display: none;'
   })
+  $tabContentTests.html($selectTests).appendTo($history);
 
-  $testContent.html($tests).appendTo($history);
-
-  var testleriGetir = function () {
-    $.get('/my_plugin/tests/issues/1').then(
+  function testleriGetir() {
+    $.get(`/my_plugin/tests/issues/${issueId}`).then(
       tests => {
         window.$selectTests = $('#test_name_input').select2({
           tags: true,
@@ -42,7 +48,7 @@ $(document).ready(function () {
           ajax: {
             // url: 'https://api.myjson.com/bins/444cr',
             url: '/my_plugin/tests',
-            width: "100%",
+            width: '100%',
             dataType: 'json',
             delay: 250,
             data: function (params) {
@@ -55,13 +61,13 @@ $(document).ready(function () {
               return false;
             },
             noResults: function () {
-              return "No results found"
+              return 'No results found'
             },
             searching: function () {
-              return "Searching…"
+              return 'Searching…'
             },
             processResults: function (data, params) {
-              console.log(">>> tests data: ", data, " >>> params: ", params);
+              console.log(`>>> tests data: ${data} >>> params: ${params}`);
               // sonuçları dönüştürün ve select2 formatına uygun hale getirin
               if (data && Array.isArray(data) && data.length == 0) {
                 results = []
@@ -81,29 +87,28 @@ $(document).ready(function () {
         });
 
         window.$selectTests.on('select2:select', function (e) {
-          console.log(">>> Seçildi");
+          console.log('>>> Seçildi');
           console.log(e);
           var data = e.params.data;
           console.log(data);
-          $.post("/my_plugin/issues/1/tests/" + data.id, {}).done(r => { alert("Test eklendi: " + r); });
+          $.post(`/my_plugin/issues/1/tests/${data.id}`, {}).done(r => { alert(`Test eklendi: ${r}`); });
         });
 
         window.$selectTests.on('select2:unselect', function (e) {
-          console.log(">>> Silindi");
+          console.log('>>> Silindi');
           console.log(e);
           var data = e.params.data;
           console.log(data);
           $.ajax({
-            url: "/my_plugin/issues/1/tests/" + data.id,
+            url: `/my_plugin/issues/1/tests/${data.id}`,
             type: 'DELETE',
             success: function (result) {
-              alert("Kayıt Silindi!");
+              alert('Kayıt Silindi!');
             }
           });
         });
 
-        window.$selectTests.val(tests).trigger('change.select2')
-
+        window.$selectTests.val(tests).trigger('change.select2');
       })
   }
 
@@ -123,7 +128,10 @@ $(document).ready(function () {
     testleriGetir();
   }
 
+}
 
+$(document).ready(function () {
+  my_plugin();
 });
 
 
