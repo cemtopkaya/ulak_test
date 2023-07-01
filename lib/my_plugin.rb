@@ -11,9 +11,6 @@ module MyPlugin
         issue_id = context[:request].params[:id]
         return nil unless issue_id.present? && issue_id.to_i.to_s == issue_id
 
-        # Eğer sayfa "issues" sayfası ise devam edelim, aksi halde hiçbir içerik eklemeyelim
-        Rails.logger.info(">>>> issue_id 1: #{issue_id}")
-        issue_data = get_issue(issue_id)
         tags = javascript_include_tag(
           "test_results.js",
           :plugin => "my_plugin",
@@ -22,13 +19,17 @@ module MyPlugin
           :plugin => "my_plugin",
           :media => "all",
         )
+
+        # Eğer sayfa "issues" sayfası ise devam edelim, aksi halde hiçbir içerik eklemeyelim
+        Rails.logger.info(">>>> issue_id 1: #{issue_id}")
+        issue_data = get_issue(issue_id)
         # Diğer JavaScript kodunu ekleyelim
         additional_js = javascript_tag(
           %Q(
-                // Burada başka JavaScript kodları olabilir
-                console.log('Additional JavaScript code');
-                var issueData = #{issue_data};
-              )
+              // Burada başka JavaScript kodları olabilir
+              console.log("The details of the issue can be accessed through the 'issueData' variable");
+              var issueData = #{issue_data};
+            )
         )
 
         tags.html_safe + additional_js

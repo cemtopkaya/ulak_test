@@ -1,7 +1,7 @@
 console.log("my_plugin.js");
 
 function my_plugin() {
-  let issueId = issueData.issue_id
+  let { issue_id: issueId, issue_tests: issueTests } = issueData
 
   // function getRemoteTab(name, remote_url, url, load_always) {
   let name = 'test_results'
