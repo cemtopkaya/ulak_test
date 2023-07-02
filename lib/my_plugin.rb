@@ -9,7 +9,6 @@ module MyPlugin
 
       def view_issues_show_description_bottom(context = {})
         issue = context[:issue]
-
         if issue.changesets.any?
           # Değişiklik kümesi varsa, burada istediğiniz içeriği oluşturun veya görüntülemek istediğiniz
           # diğer view dosyasının içeriğini buraya ekleyin.

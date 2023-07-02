@@ -172,3 +172,32 @@ I, [2023-06-27T18:36:22.470574 #107304]  INFO -- : Migrating to RemoveColumnsFro
 Ve sonuç:
 
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/f42b48dd-c46f-45d9-bf6e-eb54d68375c9)
+
+## Kodlar
+
+### issue_id'nin ilişkili revizyonlarının repository bilgilerini çeker
+
+Issue sayfasında ilişkili revizyonların içinde döner ve repository_id değerlerini tekrarsız hale getirir.
+
+```ruby
+context[:issue].changesets&.map { |c| c.repository.id }.uniq.each { |repo_id| puts repo_id }
+```
+
+Repository bilgisi:
+
+```ruby
+context[:issue].changesets&.map { |c| c.repository.id }.uniq.each { |repo_id| puts Repository.find_by_id(repo_id).inspect }
+#<Repository::Git id: 1, project_id: 1, url: "/home/redmine/repos/my_plugin.git", login: "", password: [FILTERED], root_url: "/home/redmine/repos/my_plugin.git", type: "Repository::Git", path_encoding: "", log_encoding: nil, extra_info: {"extra_report_last_commit"=>"0", "heads"=>["0ad57a72ec80071b94d1cf55bcd86474a736d631", "bd0da8a8de5717dd9248fcb04d3906825f507405"], "db_consistent"=>{"ordering"=>1}}, identifier: "git_identifier", is_default: true, created_on: "2023-07-01 09:56:24.000000000 +0000">
+```
+
+Aktif issue içindeki revizyonlardan hangi dizinde olduklarını bulup, ilgili commit id değerini kapsayan etiketleri bulur:
+
+```ruby
+context[:issue].changesets&.each { |cs| puts `git -C #{Repository.find_by_id(cs.repository_id).url} tag --contains #{cs.revision}` }
+1.1.0-1-bd0da8a8
+```
+
+- `context[:issue].changesets&`: `&` ile varsa `changesets` değerine bakar.
+- `.each { |cs|`: `changesets` içinde gez ve her birini `cs` değişkenine ata.
+- `Repository.find_by_id(cs.repository_id).url`: changeset'in repository_id değerinden repository bilgisine eriş.
+- `git -C #{Repository.find_by_id(cs.repository_id).url} tag --contains #{cs.revision}`: changeset'in commit id değerini içeren etiketleri getir.
