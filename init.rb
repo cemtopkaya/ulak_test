@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-require 'redmine'
+require "redmine"
 begin
-  require 'config/initializers/session_store.rb'
-  rescue LoadError
+  require "config/initializers/session_store.rb"
+rescue LoadError
 end
 
 def init
-  Dir::foreach(File.join(File.dirname(__FILE__), 'lib')) do |file|
+  Dir::foreach(File.join(File.dirname(__FILE__), "lib")) do |file|
     next unless /\.rb$/ =~ file
     require_dependency file
   end
@@ -28,11 +28,11 @@ else
 end
 
 Redmine::Plugin.register :my_plugin do
-  name 'My Plugin'
-  author 'Your Name'
-  description 'A simple Redmine plugin that adds custom content to the issue details page.'
-  version '1.0.0'
-  url 'https://example.com/plugin_homepage'
-  author_url 'https://example.com/your_website'
-  requires_redmine :version_or_higher => '4.0.0'
+  name "My Plugin"
+  author "Your Name"
+  description "A simple Redmine plugin that adds custom content to the issue details page."
+  version "1.0.0"
+  url "https://example.com/plugin_homepage"
+  author_url "https://example.com/your_website"
+  requires_redmine :version_or_higher => "4.0.0"
 end
