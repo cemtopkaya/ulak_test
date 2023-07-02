@@ -1,0 +1,12 @@
+<%= Rails.logger.info(">>>>>>>>>><<<<<< @changesets: #{@changesets}") %>
+<% if @changesets.present? %>
+  <h1>Kod Düzenlemeleri</h1>
+  <h3>Changesets:</h3>
+  <% @changesets.each do |changeset| %>
+    <p>Revision: <%= changeset.revision %></p>
+    <p>Committer: <%= changeset.committer %></p>
+  <% end %>
+<% else %>
+  <!-- Eğer değişiklik kümesi yoksa gösterilecek içerik burada olmalı -->
+  <h1>iyi</h1>
+<% end %>
