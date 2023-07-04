@@ -1,3 +1,5 @@
+<%= MyPlugin::Hooks::IssueTestsTab.get_tests() %>
+
 <script>
 console.log("my_plugin.js");
 
@@ -109,6 +111,8 @@ function my_plugin() {
         });
 
         window.$selectTests.val(tests).trigger('change.select2');
+
+        $refreshTestButton = $('<input type="button" onclick="refreshKiwiTests/>')
       })
   }
 

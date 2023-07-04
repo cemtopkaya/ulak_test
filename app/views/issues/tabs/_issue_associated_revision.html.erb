@@ -29,7 +29,9 @@
           <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
           <% if desired_artifact %>
             <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
-            <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.fetch_all_packages() %></pre>
+            <pre>
+              <%= "MyPlugin::Hooks::IssueAssociatedRevision.fetch_all_packages()" %>
+            </pre>
           <% end %>
         </div>
       </div>

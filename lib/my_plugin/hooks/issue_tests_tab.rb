@@ -1,3 +1,10 @@
+require "net/http"
+require "uri"
+require "json"
+require "openssl"
+
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
 module MyPlugin
   module Hooks
     class IssueTestsTab < Redmine::Hook::ViewListener
@@ -23,6 +30,44 @@ module MyPlugin
         })
         Rails.logger.info(">>>>> return: #{output}")
         output.html_safe
+      end
+
+      def self.make_post_request(url = "https://kiwi.ulakhaberlesme.com.tr/json-rpc/", body = { :jsonrpc => "2.0", :method => "TestCase.filter", :params => [{ :category__product => "3" }], :id => "jsonrpc" })
+        cookie = "ajs_user_id=da089f0e-762d-588f-b352-36da613ad1e0; ajs_anonymous_id=4638ae52-b224-44bc-b945-7cf517568e44; csrftoken=axEYH93rf6CjmdhrxKdVoazNeQJUECs2; sessionid=zv8lulm4agcuwvxg9ub9tj8isq966uay"
+
+        headers = {
+          "Cookie" => cookie, # Cookie bilgisi
+          "Content-Type" => "application/json", # İstenilen gövde türü
+        }
+
+        # HTTP isteği oluşturma
+        url = URI.parse(url)
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+        # POST isteği yapma
+        response = http.post(url.path, body.to_json, headers)
+
+        # Yanıtı alıp işleme
+        if response.is_a?(Net::HTTPSuccess)
+          puts "İstek başarılı. Yanıt: #{response.body}"
+        else
+          puts "İstek başarısız. Hata kodu: #{response.code}, Hata mesajı: #{response.message}"
+        end
+        return response
+      end
+
+      def self.get_tests
+        begin
+          response = make_post_request()
+          result = JSON.parse(response.body)["result"]
+          return result.map { |item| { id: item["id"], summary: item["summary"] } }
+        rescue StandardError => e
+          puts "Error occurred: #{e.message}"
+        end
+        # result = parsed_json['result'].map { |item| { 'id' => item['id'], 'summary' => item['summary'] } }
+
       end
     end
   end
