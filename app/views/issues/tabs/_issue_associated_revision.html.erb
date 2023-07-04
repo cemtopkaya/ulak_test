@@ -3,30 +3,33 @@
     <div id="changeset-<%= changeset.id %>" class="changeset journal">
       <div class="note">
         <h4 class='note-header'>
-          <%= avatar(changeset.user, :size => "24") %>
-          <%= authoring changeset.committed_on, changeset.author, :label => :label_added_time_by %>
+          <div class="contextual">
+            <%= link_to_revision(
+                  changeset,
+                  changeset.repository,
+                  :text => "#{l(:label_revision)} #{changeset.format_identifier}",
+                ) %>
+            <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
+              (<%= link_to(l(:label_diff),
+                           :controller => "repositories",
+                           :action => "diff",
+                           :id => changeset.project,
+                           :repository_id => changeset.repository.identifier_param,
+                           :path => "",
+                           :rev => changeset.identifier) %>)
+            <% end %>
+          </div>
+          <div>
+            <%= avatar(changeset.user, :size => "24") %>
+            <%= authoring changeset.committed_on, changeset.author, :label => :label_added_time_by %>
+          </div>
         </h4>
-        <p>
-          <%= link_to_revision(
-                changeset,
-                changeset.repository,
-                :text => "#{l(:label_revision)} #{changeset.format_identifier}",
-              ) %>
-          <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
-            (<%= link_to(l(:label_diff),
-                         :controller => "repositories",
-                         :action => "diff",
-                         :id => changeset.project,
-                         :repository_id => changeset.repository.identifier_param,
-                         :path => "",
-                         :rev => changeset.identifier) %>)
-          <% end %>
-        </p>
         <div class="wiki changeset-comments"><%= format_changeset_comments changeset %></div>
         <div class="wiki changeset-comments">
           <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
           <% if desired_artifact %>
-            <pre><%= YAML.dump(desired_artifact[:artifacts]) %></pre>
+            <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
+            <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.fetch_all_packages() %></pre>
           <% end %>
         </div>
       </div>
@@ -37,6 +40,18 @@
 
 <script>
 console.log("my_plugin > issue_associated_revision");
+
+function copyToClipboard(containerImage) {
+  const textToCopy = `docker pull ${containerImage}`; // Kopyalanacak metni buraya girin
+  const textarea = document.createElement("textarea");
+  textarea.value = textToCopy;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+
+  alert("Metin başarıyla clipboard'a kopyalandı!");
+}
 
 function issue_associated_revision() {
   let name = 'issue_associated_revision'
