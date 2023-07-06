@@ -1,0 +1,35 @@
+<table>
+  <thead>
+    <tr>
+    <th colspan="2">Kiwi REST API</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th>URL</th>
+      <td>
+        <input type="text" id="settings_rest_api_url" 
+                           value="<%= settings['rest_api_url'] %>" 
+                           name="settings[rest_api_url]" >
+      </td>
+    </tr>
+    <tr>
+      <th>Username</th>
+      <td>
+        <input type="text" id="settings_rest_api_username" 
+                           value="<%= settings['rest_api_username'] %>" 
+                           name="settings[rest_api_username]" >
+      </td>
+    </tr>
+    <tr>
+      <th>Password</th>
+      <td>
+        <input type="text" id="settings_rest_api_password" 
+                           value="<%= settings['rest_api_password'] %>" 
+                           name="settings[rest_api_password]" >
+      </td>
+    </tr>
+  </tbody>
+</table>
+<%= MyPlugin::Kiwi.fetch_kiwi_products %>
