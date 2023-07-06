@@ -17,9 +17,6 @@ class MyPluginController < ApplicationController
   end
 
   def add_test_to_issue
-    issue_id = params[:issue_id]
-    test_name = params[:test_name]
-
     issue = Issue.find(params[:issue_id])
     test = Test.find_or_create_by(test_name: params[:test_name])
     Rails.logger.info(">>>> test: #{test}")

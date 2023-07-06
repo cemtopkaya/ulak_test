@@ -4,6 +4,7 @@ require "redmine"
 begin
   require "config/initializers/session_store.rb"
 rescue LoadError
+  puts ">>> init.rb içinde store.rb yüklenirken hata"
 end
 
 def init
@@ -35,4 +36,13 @@ Redmine::Plugin.register :my_plugin do
   url "https://example.com/plugin_homepage"
   author_url "https://example.com/your_website"
   requires_redmine :version_or_higher => "4.0.0"
+
+  PLUGIN_ROOT = Pathname.new(__FILE__).join("..").realpath.to_s
+  options = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
+
+  settings default: {
+    "rest_api_url" => options["rest_api_url"],
+    "rest_api_username" => options["rest_api_username"],
+    "rest_api_password" => options["rest_api_password"],
+  }, partial: "settings/my_plugin_settings"
 end

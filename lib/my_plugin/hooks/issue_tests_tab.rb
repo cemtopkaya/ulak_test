@@ -58,6 +58,24 @@ module MyPlugin
         return response
       end
 
+      def self.sync_kiwi_tests
+        unless Setting.my_plugin["rest_api_url"].blank? && Setting.my_plugin["rest_api_username"].blank? && Setting.my_plugin["rest_api_password"].blank?
+          rest_api_url = Setting.my_plugin["rest_api_url"]
+          rest_api_username = Setting.my_plugin["rest_api_username"]
+          rest_api_password = Setting.my_plugin["rest_api_password"]
+          login_body = { :jsonrpc => "2.0",
+                        :method => "Auth.login",
+                        :id => "jsonrpc",
+                        :params => {
+            :username => rest_api_username,
+            :password => rest_api_password,
+          } }
+          make_post_request(rest_api_url, login_body.to_json)
+          puts "oldu"
+        end
+        puts "olmadı"
+      end
+
       def self.get_tests
         begin
           response = make_post_request()
