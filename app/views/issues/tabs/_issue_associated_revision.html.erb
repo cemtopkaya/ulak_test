@@ -60,16 +60,16 @@ function copyToClipboard(containerImage) {
 }
 
 function issue_associated_revision() {
-  let name = 'issue_associated_revision'
+  let tabName = 'issue_associated_revision'
   let issueId=1
-  remote_url = `/my_plugin/${issueId}/tab/test_results`;
   url = `/issues/${issueId}?tab=test_results`;
+  remote_url = `/my_plugin/${issueId}/tab/${tabName}`;
   // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
   let $tabCodeRevisionsHeader = $("<a />", {
-    id: "tab-issue_associated_revision",
+    id: `tab-${tabName}`,
     class: "",
-    onclick: `getRemoteTab('${name}', '${remote_url}', '${url}'); return false;`,
-    href: `/issues/${issueId}?tab=${name}`,
+    onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
+    href: `/issues/${issueId}?tab=${tabName}`,
     text: "Issue Code Revisions"
   });
 
@@ -88,7 +88,7 @@ function issue_associated_revision() {
   $tabContentCodeRevisionsHeader.appendTo($history);
 
   function testleriGetir() {
-    $.get(`/my_plugin/tests/issues/${issueId}`).then(
+    $.get(`/my_plugin/issues/${issueId}/tests/`).then(
       tests => {
         window.$selectTests = $('#test_name_input').select2({
           tags: true,

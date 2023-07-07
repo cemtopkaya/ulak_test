@@ -1,19 +1,19 @@
 class MyPluginController < ApplicationController
   def remove_test_from_issue
     issue_id = params[:issue_id]
-    summary = params[:summary]
+    test_id = params[:test_id]
 
     issue = Issue.find_by(id: issue_id)
     return render json: { error: "Issue not found" }, status: :not_found unless issue
 
-    test = Test.find_by(summary: summary)
+    test = Test.find_by(id: test_id)
     return render json: { error: "Test not found" }, status: :not_found unless test
 
     issue_test = IssueTest.find_by(issue: issue, test: test)
     return render json: { error: "Test not found in the issue" }, status: :not_found unless issue_test
 
     issue_test.destroy
-    render json: { message: "Test removed from issue successfully" }, status: :ok
+    render json: { message: "#{test.summary} Test removed from issue successfully" }, status: :ok
   end
 
   def sync_kiwi_test_cases
@@ -37,14 +37,17 @@ class MyPluginController < ApplicationController
 
   def add_test_to_issue
     issue = Issue.find(params[:issue_id])
-    test = Test.find_or_create_by(summary: params[:summary])
+    test = Test.find_by(id: params[:test_id])
     Rails.logger.info(">>>> test: #{test}")
 
     # "IssueTest" modelini kullanarak ilişkiyi ekleyin
-    IssueTest.create(issue: issue, test: test)
+    IssueTest.find_or_create_by(issue: issue, test: test)
     # issue.tests << test
 
-    render json: { success: true }
+    render json: {
+             success: true,
+             message: "#{issue.id} Numaralı görev için #{test.id} numaralı test eklendi.",
+           }
   end
 
   def get_issue_tests
@@ -57,7 +60,7 @@ class MyPluginController < ApplicationController
 
     # "tests" dizisini istenen formata dönüştürmek için map kullanıyoruz
     # formatted_tests = tests.map { |test| { id: test.id, text: test.summary } }
-    formatted_tests = tests.map { |test| test.summary }
+    formatted_tests = tests.map { |test| { id: test.id, summary: test.summary } }
 
     Rails.logger.info(">>>> tests: #{tests}")
     render json: formatted_tests, status: :ok
@@ -98,6 +101,29 @@ class MyPluginController < ApplicationController
     html_content = render_to_string(
       # /usr/src/redmine/plugins/my_plugin/app/views/my_plugin/my_template.html.erb
       template: "templates/test_results.html.erb",
+      # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
+      layout: false,
+    )
+    render html: html_content
+  end
+
+  def view_issue_test_results
+    issue_id = params[:issue_id]
+    tests = Test
+      .joins(:issue_tests)
+      .where(issue_tests: { issue_id: issue_id })
+      .select(:id, :summary)
+    unless tests.empty?
+      formatted_tests = tests.map { |test| { id: test.id, text: test.summary } }
+    else
+      formatted_tests = []
+    end
+
+    @issue_data = { issue_id: issue_id, issue_tests: formatted_tests }.to_json
+
+    html_content = render_to_string(
+      # /usr/src/redmine/plugins/my_plugin/app/views/my_plugin/my_template.html.erb
+      template: "templates/_issue_test_results.html.erb",
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
       layout: false,
     )
