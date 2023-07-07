@@ -139,13 +139,19 @@ module MyPlugin
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
-        result = JSON.parse(response.body)["result"]
-        result
+        if response.is_a?(Net::HTTPSuccess)
+          puts "İstek başarılı. Yanıt: #{response.body}"
+          result = JSON.parse(response.body)["result"]
+        else
+          puts "İstek başarısız. Hata kodu: #{response.code}, Hata mesajı: #{response.message}"
+        end
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
       end
 
       logout()
+
+      result
     end
 
     def self.fetch_kiwi_product_categories(product_id = 3)
@@ -188,12 +194,12 @@ module MyPlugin
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
-        result
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
       end
 
       logout()
+      result
     end
   end
 end

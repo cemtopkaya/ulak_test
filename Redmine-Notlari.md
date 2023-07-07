@@ -201,3 +201,18 @@ context[:issue].changesets&.each { |cs| puts `git -C #{Repository.find_by_id(cs.
 - `.each { |cs|`: `changesets` içinde gez ve her birini `cs` değişkenine ata.
 - `Repository.find_by_id(cs.repository_id).url`: changeset'in repository_id değerinden repository bilgisine eriş.
 - `git -C #{Repository.find_by_id(cs.repository_id).url} tag --contains #{cs.revision}`: changeset'in commit id değerini içeren etiketleri getir.
+
+
+# db:migrate ve Veritabanı İşlemleri
+
+Tüm "redmine" veritabanını önce siler (`db:drop`) sonra yaratır ve güncelleme dosyalarını çalıştırır.
+
+```shell
+bundle exec rake db:drop db:create db:migrate
+```
+
+Belirli bir eklenti için `db:migrate` çalıştırılır
+
+```shell
+root@c802f15a15b8:/usr/src/redmine/plugins/my_plugin# bundle exec rake redmine:plugins:migrate NAME=my_plugin RAILS_ENV=production --trace
+```

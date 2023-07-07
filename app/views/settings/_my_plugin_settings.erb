@@ -30,6 +30,23 @@
                            name="settings[rest_api_password]" >
       </td>
     </tr>
+    <tr>
+      <th>Sync Kiwi Tests</th>
+      <td>
+      <script>
+        function syncKiwiTests(){
+          $.get( "/my_plugin/tests/sync", function( data ) {
+            console.log( data );
+            mesaj = `${data.after-data.before} Kayıt eklendi` 
+            alert( "Eşleştirme başarıyla tamamlandı.\n", mesaj );
+          });
+        }
+      </script>
+        <input type="button" id="btn_sync_kiwi_tests" 
+                           value="Sync Kiwi Tests" 
+                           name="btn_sync_kiwi_tests" onclick="syncKiwiTests()">
+      </td>
+    </tr>
   </tbody>
 </table>
-<%= MyPlugin::Kiwi.fetch_kiwi_products %>
+<%= MyPlugin::Kiwi.fetch_kiwi_product_categories %>

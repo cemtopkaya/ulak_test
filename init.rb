@@ -1,16 +1,15 @@
 # encoding: utf-8
 
 require "redmine"
-begin
-  require "config/initializers/session_store.rb"
-rescue LoadError
-  puts ">>> init.rb içinde store.rb yüklenirken hata"
-end
 
 def init
-  Dir::foreach(File.join(File.dirname(__FILE__), "lib")) do |file|
-    next unless /\.rb$/ =~ file
-    require_dependency file
+  begin
+    Dir::foreach(File.join(File.dirname(__FILE__), "lib")) do |file|
+      next unless /\.rb$/ =~ file
+      require_dependency file
+    end
+  rescue LoadError => le
+    puts "--- Error: init.rb içinde store.rb yüklenirken hata: #{le.message}"
   end
 end
 

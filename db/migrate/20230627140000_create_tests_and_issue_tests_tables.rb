@@ -5,7 +5,10 @@ class CreateTestsAndIssueTestsTables < ActiveRecord::Migration[5.2]
     puts "Running migration: CreateTestsAndIssueTestsTables"
 
     create_table :tests do |t|
-      t.string :test_name
+      t.integer :test_case_id, index: true
+      t.string :summary
+      t.integer :category
+      t.string :category_name
       t.integer :product_id
       t.timestamps
     end

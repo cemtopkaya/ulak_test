@@ -1,4 +1,8 @@
 <div id="kod_surumleri">
+  <% if @changesets.empty? %>
+    <em>Henüz kod güncellemesi yapılmamış</em>
+  <% end %>
+
   <% @changesets.each do |changeset| %>
     <div id="changeset-<%= changeset.id %>" class="changeset journal">
       <div class="note">

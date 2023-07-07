@@ -1,12 +1,12 @@
 class MyPluginController < ApplicationController
   def remove_test_from_issue
     issue_id = params[:issue_id]
-    test_name = params[:test_name]
+    summary = params[:summary]
 
     issue = Issue.find_by(id: issue_id)
     return render json: { error: "Issue not found" }, status: :not_found unless issue
 
-    test = Test.find_by(test_name: test_name)
+    test = Test.find_by(summary: summary)
     return render json: { error: "Test not found" }, status: :not_found unless test
 
     issue_test = IssueTest.find_by(issue: issue, test: test)
@@ -16,9 +16,28 @@ class MyPluginController < ApplicationController
     render json: { message: "Test removed from issue successfully" }, status: :ok
   end
 
+  def sync_kiwi_test_cases
+    all_tests_before = Test.all
+    products = MyPlugin::Kiwi.fetch_kiwi_products()
+    products.each do |product|
+      cases = MyPlugin::Kiwi.fetch_kiwi_test_cases(product["id"])
+      Rails.logger.info(">>> cases: #{cases}")
+      cases.each do |c|
+        test = Test.find_or_create_by({ test_case_id: c["id"], summary: c["summary"], product_id: product["id"], category: c["category"], category_name: c["category__name"] })
+        puts "test: #{test}"
+      end
+    end
+    all_tests_after = Test.all
+
+    render json: {
+      before: all_tests_before.count,
+      after: all_tests_after.count,
+    }, status: :ok
+  end
+
   def add_test_to_issue
     issue = Issue.find(params[:issue_id])
-    test = Test.find_or_create_by(test_name: params[:test_name])
+    test = Test.find_or_create_by(summary: params[:summary])
     Rails.logger.info(">>>> test: #{test}")
 
     # "IssueTest" modelini kullanarak ilişkiyi ekleyin
@@ -34,29 +53,36 @@ class MyPluginController < ApplicationController
     return render json: { error: "Issue not found" }, status: :not_found unless issue
 
     tests = Test.joins(:issue_tests).where(issue_tests: { issue_id: issue_id })
-      .select(:id, :test_name) # Sadece testin id ve test_name alanlarını seçiyoruz
+      .select(:id, :summary) # Sadece testin id ve summary alanlarını seçiyoruz
 
     # "tests" dizisini istenen formata dönüştürmek için map kullanıyoruz
-    # formatted_tests = tests.map { |test| { id: test.id, text: test.test_name } }
-    formatted_tests = tests.map { |test| test.test_name }
+    # formatted_tests = tests.map { |test| { id: test.id, text: test.summary } }
+    formatted_tests = tests.map { |test| test.summary }
 
     Rails.logger.info(">>>> tests: #{tests}")
     render json: formatted_tests, status: :ok
   end
 
   def get_tests
-    result = []
-    # Burada sunucu tarafında yapılması gereken işlemleri gerçekleştirin ve dizi verilerini elde edin
-    data = ["KT_CN_001", "KT_CN_002", "KT_CN_003", "KT_CN_004"]
-
+    issue_id = params[:issue_id]
     q = params[:q]
-    if q
-      filtered_data = data.select { |item| item.include?(q) }
-      puts filtered_data
-      result = filtered_data
-    end
 
-    render json: result
+    if q
+      tests = Test
+      # .joins(:issue_tests)
+      # .where(issue_tests: { issue_id: issue_id })
+        .where("tests.summary LIKE ?", "%#{q}%")
+        .select(:id, :summary) # Sadece testin id ve summary alanlarını seçiyoruz
+    else
+      tests = Test
+      # .joins(:issue_tests)
+      # .where(issue_tests: { issue_id: issue_id })
+        .where("tests.summary LIKE ?", "%#{q}%")
+        .select(:id, :summary) # Sadece testin id ve summary alanlarını seçiyoruz
+    end
+    puts tests.to_sql
+
+    render json: tests
   end
 
   def index

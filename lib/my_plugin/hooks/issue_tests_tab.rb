@@ -10,8 +10,13 @@ module MyPlugin
     class IssueTestsTab < Redmine::Hook::ViewListener
       def view_issues_show_description_bottom(context = {})
         issue_id = context[:request].params[:id]
-        tests = Test.joins(:issue_tests).where(issue_tests: { issue_id: issue_id }).select(:id, :test_name)
-        formatted_tests = tests.map { |test| { id: test.id, text: test.test_name } }
+        tests = Test.joins(:issue_tests).where(issue_tests: { issue_id: issue_id }).select(:id, :summary)
+        unless tests.empty?
+          formatted_tests = tests.map { |test| { id: test.id, text: test.summary } }
+        else
+          formatted_tests = []
+        end
+
         issue_data = { issue_id: issue_id, issue_tests: formatted_tests }.to_json
 
         hook_caller = context[:hook_caller]
