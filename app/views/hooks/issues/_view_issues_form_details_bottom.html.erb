@@ -1,40 +1,12 @@
-<h1>test ister misin</h1>
+<h1>test ister misin view_issues_form_details_bottom</h1>
+<div id="test-container"></div>
 
 <script>
 console.log("my_plugin.js");
 
 $(document).ready(function () {
   issueData = <%= raw issue_data %>
-  let { issue_id: issueId } = issueData
-  let tabName = 'test_results'
-  let tabHeaderId = 'tab-test_results'
-  let tabContentId = 'tab-content-test_results'
-  let url = `/issues/${issueId}?tab=${tabName}`;
-  let remote_url = `/my_plugin/issues/${issueId}/tab/${tabName}`;
-
-  function createTabHeader($history_ul) {
-    // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
-    let $tabTestResultHeader = $("<a />", {
-      id: `${tabHeaderId}`,
-      class: "",
-      onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
-      href: `/issues/${issueId}?tab=${tabName}`,
-      text: "Test Results"
-    });
-
-    return $('<li>').html($tabTestResultHeader)
-  }
-
-  function createTabContent() {
-    let $tabContentCodeRevisionsHeader = $('<div>', {
-      id: `${tabContentId}`,
-      class: 'tab-content',
-      title: 'Test result will be shown here',
-      style: 'display: none;'
-    })
-
-    return $tabContentCodeRevisionsHeader
-  }
+  let { issue_id: issueId } = issue_data
 
   function bindTests() {
     // Testleri SELECT2 içinde gösterelim
@@ -46,14 +18,7 @@ $(document).ready(function () {
       'data-minimum-results-for-search': 'Infinity'
     });
 
-    let $tabContentTests = $('<div>', {
-      id: `${tabContentId}`,
-      class: 'tab-content',
-      title: 'Test results will be displayed in this section',
-      style: 'display: none;'
-    })
-
-    $tabContentTests.html($select2Tests).appendTo($history);
+    $("#test-container").html($select2Tests);
 
     function testleriGetir() {
       $.get(`/my_plugin/issues/${issueId}/tests`).then(
@@ -153,11 +118,8 @@ $(document).ready(function () {
     }
   }
 
-  function init(){
-    let $history = $('#history')
-    let $history_ul = $history.find('div.tabs ul')
-    $history_ul.append(createTabHeader());
-    $history.append(createTabContent());
-  }
+  (function init(){
+    bindTests()
+  })()
 });
 </script>
