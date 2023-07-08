@@ -5,6 +5,14 @@ module MyPlugin
       "Content-Type" => "application/json", # İstenilen gövde türü
     }
 
+    def self.create_http(url)
+      url = URI.parse(url)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http
+    end
+
     def self.get_rest_info
       unless Setting.plugin_my_plugin["rest_api_url"].blank? && Setting.plugin_my_plugin["rest_api_username"].blank? && Setting.plugin_my_plugin["rest_api_password"].blank?
         url = Setting.plugin_my_plugin["rest_api_url"]
@@ -86,10 +94,7 @@ module MyPlugin
         body = make_request_body("TestCase.filter", [{ :category__product => "3" }])
 
         # HTTP isteği oluşturma
-        url = URI.parse(rest.fetch(:url))
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http = create_http(rest.fetch(:url))
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
@@ -101,41 +106,36 @@ module MyPlugin
 
     def self.fetch_kiwi_product(id = 3)
       login()
+      result = nil
 
       begin
         rest = get_rest_info()
         body = make_request_body("Product.filter", [{ "id": id }])
 
         # HTTP isteği oluşturma
-        url = URI.parse(rest.fetch(:url))
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http = create_http(rest.fetch(:url))
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
-        result
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
       end
-
-      logout()
+      result
     end
 
     def self.fetch_kiwi_products()
       login()
+      result = nil
 
       begin
         rest = get_rest_info()
         body = make_request_body("Product.filter", [])
 
         # HTTP isteği oluşturma
-        url = URI.parse(rest.fetch(:url))
-        http = Net::HTTP.new(url.host, url.port)
-        http.set_debug_output($stdout)
-        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http = create_http(rest.fetch(:url))
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
@@ -147,58 +147,148 @@ module MyPlugin
         end
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
       end
-
-      logout()
 
       result
     end
 
     def self.fetch_kiwi_product_categories(product_id = 3)
       login()
+      result = nil
 
       begin
         rest = get_rest_info()
         body = make_request_body("Category.filter", [{ product: product_id }])
 
         # HTTP isteği oluşturma
-        url = URI.parse(rest.fetch(:url))
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http = create_http(rest.fetch(:url))
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
-        result
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
       end
 
-      logout()
+      result
     end
 
     def self.fetch_kiwi_test_cases(category_product = "3")
       login()
+      result = nil
 
       begin
         rest = get_rest_info()
         body = make_request_body("TestCase.filter", [{ :category__product => category_product }])
 
         # HTTP isteği oluşturma
-        url = URI.parse(rest.fetch(:url))
-        http = Net::HTTP.new(url.host, url.port)
-        http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http = create_http(rest.fetch(:url))
 
         # POST isteği yapma
         response = http.post(url.path, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
       end
 
-      logout()
+      result
+    end
+
+    def self.fetch_testexecution_by_case_id_in(case_ids)
+      # parametre türünü belirtme
+      # @param [Array] case_ids
+      unless case_ids.is_a?(Array)
+        raise ArgumentError, "case_ids parameter must be an array"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_rest_info()
+        body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
+
+        # HTTP isteği oluşturma
+        http = create_http(rest.fetch(:url))
+
+        # POST isteği yapma
+        response = http.post(url.path, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
+      result
+    end
+
+    # ID değerleri verilen test durumlarının (test case) koşturulduğu
+    # ve sonuçlarında koşunun durumunu dönecek fonksiyon.
+
+    # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi
+    # @return [Array] Test sürdürmelerinin bir dizisi
+    def self.fetch_testexecution_by_case_id_in(case_ids)
+      unless case_ids.is_a?(Array)
+        raise ArgumentError, "case_ids parameter must be an array"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_rest_info()
+        body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
+
+        # HTTP isteği oluşturma
+        http = create_http(rest.fetch(:url))
+
+        # POST isteği yapma
+        response = http.post(url.path, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
+      result
+    end
+
+    # Case ID değerleri için yapılan testler
+
+    # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi
+    # @return [Array] Test sürdürmelerinin bir dizisi
+    def fetch_run_by_case_id_in(run_ids)
+      unless run_ids.is_a?(Array)
+        raise ArgumentError, "run_ids parameter must be an array"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_rest_info()
+        body = make_request_body("TestRun.filter", [{ :id__in => run_ids }])
+
+        # HTTP isteği oluşturma
+        http = create_http(rest.fetch(:url))
+
+        # POST isteği yapma
+        response = http.post(url.path, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
       result
     end
   end

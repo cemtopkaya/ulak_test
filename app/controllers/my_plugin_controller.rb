@@ -119,6 +119,11 @@ class MyPluginController < ApplicationController
       formatted_tests = []
     end
 
+    test_case_ids = formatted_tests.pluck(:id)
+    executions = MyPlugin::Kiwi.fetch_testexecution_by_case_id_in(test_case_ids)
+    run_ids = executions.pluck(:run)
+    runs = MyPlugin::Kiwi.fetch_run_by_case_id_in(run_ids)
+
     @issue_data = { issue_id: issue_id, issue_tests: formatted_tests }.to_json
 
     html_content = render_to_string(
