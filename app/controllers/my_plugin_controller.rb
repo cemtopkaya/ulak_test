@@ -113,6 +113,7 @@ class MyPluginController < ApplicationController
       .joins(:issue_tests)
       .where(issue_tests: { issue_id: issue_id })
       .select(:id, :summary)
+
     unless tests.empty?
       formatted_tests = tests.map { |test| { id: test.id, text: test.summary } }
     else
@@ -121,6 +122,9 @@ class MyPluginController < ApplicationController
 
     test_case_ids = formatted_tests.pluck(:id)
     executions = MyPlugin::Kiwi.fetch_testexecution_by_case_id_in(test_case_ids)
+
+    formatted_tests.each { |test| test[:executions] = executions.select { |item| item[:case] == test["id"] } }
+
     run_ids = executions.pluck(:run)
     runs = MyPlugin::Kiwi.fetch_run_by_case_id_in(run_ids)
 

@@ -5,8 +5,8 @@ module MyPlugin
       "Content-Type" => "application/json", # İstenilen gövde türü
     }
 
-    def self.create_http(url)
-      url = URI.parse(url)
+    def self.create_http(_url)
+      url = URI.parse(_url)
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true # Eğer HTTPS kullanılıyorsa bu satırı eklemeliyiz
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -74,7 +74,7 @@ module MyPlugin
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         # Yanıtı alıp işleme
         if response.is_a?(Net::HTTPSuccess)
           puts "İstek başarılı. Yanıt: #{response.body}"
@@ -94,10 +94,11 @@ module MyPlugin
         body = make_request_body("TestCase.filter", [{ :category__product => "3" }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         puts ">>>> Cevap istisnasız geldi: #{response}"
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -113,10 +114,11 @@ module MyPlugin
         body = make_request_body("Product.filter", [{ "id": id }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -135,10 +137,11 @@ module MyPlugin
         body = make_request_body("Product.filter", [])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         if response.is_a?(Net::HTTPSuccess)
           puts "İstek başarılı. Yanıt: #{response.body}"
           result = JSON.parse(response.body)["result"]
@@ -163,10 +166,11 @@ module MyPlugin
         body = make_request_body("Category.filter", [{ product: product_id }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -186,10 +190,11 @@ module MyPlugin
         body = make_request_body("TestCase.filter", [{ :category__product => category_product }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -215,10 +220,11 @@ module MyPlugin
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -247,10 +253,11 @@ module MyPlugin
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
@@ -265,7 +272,7 @@ module MyPlugin
 
     # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi
     # @return [Array] Test sürdürmelerinin bir dizisi
-    def fetch_run_by_case_id_in(run_ids)
+    def self.fetch_run_by_case_id_in(run_ids)
       unless run_ids.is_a?(Array)
         raise ArgumentError, "run_ids parameter must be an array"
       end
@@ -278,10 +285,11 @@ module MyPlugin
         body = make_request_body("TestRun.filter", [{ :id__in => run_ids }])
 
         # HTTP isteği oluşturma
-        http = create_http(rest.fetch(:url))
+        url = rest.fetch(:url)
+        http = create_http(url)
 
         # POST isteği yapma
-        response = http.post(url.path, body.to_json, @headers)
+        response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
