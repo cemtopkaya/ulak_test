@@ -1,0 +1,163 @@
+<h1>test ister misin</h1>
+
+<script>
+console.log("my_plugin.js");
+
+$(document).ready(function () {
+  issueData = <%= raw issue_data %>
+  let { issue_id: issueId } = issueData
+  let tabName = 'test_results'
+  let tabHeaderId = 'tab-test_results'
+  let tabContentId = 'tab-content-test_results'
+  let url = `/issues/${issueId}?tab=${tabName}`;
+  let remote_url = `/my_plugin/issues/${issueId}/tab/${tabName}`;
+
+  function createTabHeader($history_ul) {
+    // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
+    let $tabTestResultHeader = $("<a />", {
+      id: `${tabHeaderId}`,
+      class: "",
+      onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
+      href: `/issues/${issueId}?tab=${tabName}`,
+      text: "Test Results"
+    });
+
+    return $('<li>').html($tabTestResultHeader)
+  }
+
+  function createTabContent() {
+    let $tabContentCodeRevisionsHeader = $('<div>', {
+      id: `${tabContentId}`,
+      class: 'tab-content',
+      title: 'Test result will be shown here',
+      style: 'display: none;'
+    })
+
+    return $tabContentCodeRevisionsHeader
+  }
+
+  function bindTests() {
+    // Testleri SELECT2 içinde gösterelim
+    let $select2Tests = $('<select />', {
+      multiple: 'multiple',
+      class: 'form-control',
+      id: 'test_name_input',
+      style: 'width: 400px;',
+      'data-minimum-results-for-search': 'Infinity'
+    });
+
+    let $tabContentTests = $('<div>', {
+      id: `${tabContentId}`,
+      class: 'tab-content',
+      title: 'Test results will be displayed in this section',
+      style: 'display: none;'
+    })
+
+    $tabContentTests.html($select2Tests).appendTo($history);
+
+    function testleriGetir() {
+      $.get(`/my_plugin/issues/${issueId}/tests`).then(
+        tests => {
+          issueTests = tests.map(t => {
+            return { id: t.id, text: t.summary }
+          })
+
+          $select2Tests = $('#test_name_input').select2({
+            tags: true,
+            multiple: true,
+            minimumInputLength: 2,
+            data: issueTests,
+            ajax: {
+              // url: 'https://api.myjson.com/bins/444cr',
+              url: '/my_plugin/tests',
+              width: '100%',
+              dataType: 'json',
+              delay: 250,
+              data: function (params) {
+                return {
+                  q: params.term, // arama terimini gönderin
+                  page: params.page
+                };
+              },
+              createSearchChoice: function (term) {
+                return false;
+              },
+              noResults: function () {
+                return 'No results found'
+              },
+              searching: function () {
+                return 'Searching…'
+              },
+              processResults: function (data, params) {
+                console.log(`>>> tests data: ${data} >>> params: ${params}`);
+                // sonuçları dönüştürün ve select2 formatına uygun hale getirin
+                if (data && Array.isArray(data) && data.length == 0) {
+                  results = []
+                } else {
+                  results = data.map(function (d) { return { id: d.id, text: d.summary } })
+                }
+
+                return {
+                  results,
+                  pagination: {
+                    more: (params.page * 30) < data.total_count
+                  }
+                };
+              },
+              cache: true
+            }
+          });
+
+          $select2Tests.on('select2:select', function (e) {
+            console.log('>>> Seçildi');
+            console.log(e);
+            var data = e.params.data;
+            console.log(data);
+            $.post(`/my_plugin/issues/1/tests/${data.id}`, {})
+              .done(r => { alert(`${data.text} Testi eklendi: ${r}`); });
+          });
+
+          $select2Tests.on('select2:unselect', function (e) {
+            console.log('>>> Silindi');
+            console.log(e);
+            var data = e.params.data;
+            console.log(data);
+            $.ajax({
+              url: `/my_plugin/issues/1/tests/${data.id}`,
+              type: 'DELETE',
+              success: function (result) {
+                alert('Kayıt Silindi!');
+              }
+            });
+          });
+
+          $select2Tests.val(issueTests).trigger('change.select2');
+          window.st = $select2Tests
+        })
+    }
+
+    if (typeof $.fn.select2 === 'undefined') {
+      // select2 kütüphanesi yüklü değil, yükleyin
+      var link = document.createElement('link');
+      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css';
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      document.head.appendChild(link);
+
+      var script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js';
+      document.head.appendChild(script);
+      script.onload = testleriGetir;
+    } else {
+      testleriGetir();
+    }
+  }
+
+  function init(){
+    let $history = $('#history')
+    let $history_ul = $history.find('div.tabs ul')
+    $history_ul.append(createTabHeader());
+    $history.append(createTabContent());
+  }
+});
+</script>

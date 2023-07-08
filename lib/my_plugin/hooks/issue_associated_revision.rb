@@ -11,10 +11,12 @@ module MyPlugin
 
         hook_caller = context[:hook_caller]
         controller = hook_caller.is_a?(ActionController::Base) ? hook_caller : hook_caller.controller
+
         output = controller.send(:render_to_string, {
           partial: "issues/tabs/issue_associated_revision",
           locals: { "@changesets": issue.changesets, artifacts: associated_revisions },
         })
+
         output
       end
 
