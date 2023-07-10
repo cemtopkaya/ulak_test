@@ -1,7 +1,7 @@
 module MyPlugin
   module Hooks
     class IssueTestsTab < Redmine::Hook::ViewListener
-      def view_issues_form_details_bottom(context = {})
+      def view_issues_form_details_bottom2(context = {})
         if context[:issue].new_record?
           # JavaScript kodunu ekle
           javascript_code = <<-JS
@@ -45,12 +45,13 @@ module MyPlugin
       # end
 
       def controller_issues_new_before_save(context = {})
-        test_name_input = context[:params][:issue][:issue][:test_name_input]
         # set my_attribute on the issue to a default value if not set explictly
         Rails.logger.info(">>> controller_issues_new_before_save  kısmına geldik <<<")
       end
 
       def controller_issues_edit_after_save(context = {})
+        issue_id = context[:issue].id
+        test_name_input = context[:params][:issue][:issue][:test_name_input]
         # set my_attribute on the issue to a default value if not set explictly
         Rails.logger.info(">>> controller_issues_edit_after_save  kısmına geldik <<<")
       end
@@ -84,7 +85,7 @@ module MyPlugin
         end
       end
 
-      def view_issues_form_details_bottom2(context = {})
+      def view_issues_form_details_bottom(context = {})
         issue_id = context[:request].params[:id]
         tests = Test
           .joins(:issue_tests)

@@ -128,6 +128,9 @@ class MyPluginController < ApplicationController
     run_ids = executions.pluck(:run)
     runs = MyPlugin::Kiwi.fetch_run_by_case_id_in(run_ids)
 
+    # runs.each > her koşunun note alanına bak
+    # issue->changeset içindeki sürüme ait paket run.note alanında var mı?
+    # varsa test senaryosunun durumuna göre template içindeki ok, not-ok göster.
     @issue_data = { issue_id: issue_id, issue_tests: formatted_tests }.to_json
 
     html_content = render_to_string(
