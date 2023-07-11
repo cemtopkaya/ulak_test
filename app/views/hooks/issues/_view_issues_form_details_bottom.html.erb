@@ -1,120 +1,77 @@
-<div id="test-container" style='height:200px;'>
-  <p>
-    <label for="test_name_input"><%= l(:issue_tests) %></label>
-    <select id="test_name_input" class="form-control" style='width: 100%;height:200px;'></select>
-  </p>
-</div>
+<%= javascript_include_tag 'issue_edit_test.js', :plugin => 'my_plugin' %>
+
+<% content_for :p do %>
+  <h1>Merhaba Uranüs</h1>
+  <div class="test-selec-input">
+    <%= label_tag(:test_select_input, "Issue Tests Şablondan", class: "test-selec-label", for: "test_select_input") %>
+    <%= select_tag(:test_select_input, options_for_select(select_options), label: "Tests", class: "test-select-field") %>
+  </div>
+<% end %>
 
 <script>
 console.log("my_plugin.js");
 
-function bindTests() {
+function initSelect2() {
 
-  issueData = <%= raw issue_data %>
-    let { issue_id: issueId, tests: tests } = issueData
-
-  function testleriGetir() {
-    $.get(`/my_plugin/issues/${issueId}/tests`).then(
-      tests => {
-        issueTests = tests.map(t => {
-          return { id: t.id, text: t.summary }
-        })
-
-        console.log(">>> Issue tests are: ", JSON.stringify(issueTests));
-
-        function data(params, data) {
-          console.log(`>>> data fonksiyonu çalışıyor: ${data} >>> params: ${params}`);
-          return {
-            q: params.term, // Arama terimini gönderin
-            page: params.page
-          };
-        }
-
-        function createSearchChoice(term) {
-          console.log(`>>> createSearchChoice fonksiyonu çalışıyor  >>> term: ${term}`);
-          return false;
-        }
-
-        function noResults() {
-          return 'No results found'
-        }
-
-        function searching() {
-          return 'Searching…'
-        }
-
-        function processResults(data, params) {
-          console.log(`>>> tests data: ${data} >>> params: ${params}`);
-
-          var filteredResults = [];
-
-          // Tüm sonuçları gezerek issue için eklenmiş olanları filtreleyin
-          data.forEach(function (test) {
-            var isAdded = issueTests.some(function (issueTest) {
-              return issueTest.id === test.id;
-            });
-
-            if (!isAdded) {
-              filteredResults.push({ id: test.id, text: test.summary });
-            }
-          });
-
-          return {
-            results: filteredResults
-          };
-        }
-
-        $select2Tests = $('#test_name_input').select2({
-          multiple: true,
-          minimumInputLength: 2,
-          ajax: {
-            url: '/my_plugin/tests',
-            width: '100%',
-            dataType: 'json',
-            delay: 250,
-            cache: true,
-            data,
-            createSearchChoice,
-            noResults,
-            searching,
-            processResults,
-          }
-        });
-
-        function onTestAdded (e) {
-          console.log('>>> Seçildi');
-          console.log(e);
-          var data = e.params.data;
-          console.log(data);
-          $.post(`/my_plugin/issues/1/tests/${data.id}`, {})
-            .done(r => { alert(`${data.text} Testi eklendi: ${r}`); });
-        }
-
-        function onTestRemoved(e) {
-          console.log('>>> Silindi');
-          console.log(e);
-          var data = e.params.data;
-          console.log(data);
-          $.ajax({
-            url: `/my_plugin/issues/1/tests/${data.id}`,
-            type: 'DELETE',
-            success: function (result) {
-              alert('Kayıt Silindi!');
-            }
-          });
-        }
-
-        $select2Tests.on('select2:select', onTestAdded);
-        $select2Tests.on('select2:unselect', onTestRemoved);
-
-        issueTests.forEach(i => {
-          var $newOption = $("<option selected='selected'></option>").val(i.id).text(i.text)
-          $("#test_name_input").append($newOption).trigger('change');
-        })
-        console.log(">>> seçili elemanlar ", $select2Tests.val())
-      })
+  function data(params, data) {
+    console.log(`>>> data fonksiyonu >>> data: ${data} >>> params: ${params}`);
+    return {
+      q: params.term, // Arama terimini gönderin
+      page: params.page
+    };
   }
 
+  function createSearchChoice(term) {
+    console.log(`>>> createSearchChoice fonksiyonu >>> term: ${term}`);
+    return false;
+  }
+
+  function noResults() {
+    return 'No results found'
+  }
+
+  function searching() {
+    return 'Searching…'
+  }
+
+  function processResults(data, params) {
+    console.log(`>>> tests data: ${data} >>> params: ${params}`);
+
+    var filteredResults = [];
+    let $select2 = this.$element
+    // Tüm sonuçları gezerek issue için eklenmiş olanları filtreleyin
+    data.forEach(function (test) {
+      var isAdded = $select2.val().some(added => added == test.id);
+
+      if (!isAdded) {
+        filteredResults.push({ id: test.id, text: test.summary });
+      }
+    });
+
+    return {
+      results: filteredResults
+    };
+  }
+
+  $select2Tests = $('#test_select_input').select2({
+    multiple: true,
+    minimumInputLength: 2,
+    ajax: {
+      url: '/my_plugin/tests',
+      width: '100%',
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data,
+      createSearchChoice,
+      noResults,
+      searching,
+      processResults,
+    }
+  });
+}
+
+$(document).ready(function () {
   if (typeof $.fn.select2 === 'undefined') {
     // select2 kütüphanesi yüklü değil, yükleyin
     var link = document.createElement('link');
@@ -126,15 +83,9 @@ function bindTests() {
     var script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js';
     document.head.appendChild(script);
-    script.onload = testleriGetir;
+    script.onload = initSelect2
   } else {
-    testleriGetir();
+    initSelect2()
   }
-}
-
-$(document).ready(function () {
-  (function init() {
-    bindTests()
-  })()
 });
 </script>

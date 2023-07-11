@@ -1,3 +1,4 @@
 # English strings go here for Rails i18n
 en:
-  issue_tests: "Issue Tests"
+  issue_tests: Issue Tests
+  field_issue_tests: Issue Tests

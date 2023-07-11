@@ -1,3 +1,4 @@
 # Turkish strings go here for Rails i18n
 tr:
-  issue_tests: "Görev Testleri"
+  issue_tests: Görev Testleri
+  field_issue_tests: Görev Testleri
