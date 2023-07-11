@@ -1,8 +1,5 @@
 class MyPluginController < ApplicationController
-  def remove_test_from_issue
-    issue_id = params[:issue_id]
-    test_id = params[:test_id]
-
+  def self.remove_test_from_issue(issue_id, test_id)
     issue = Issue.find_by(id: issue_id)
     return render json: { error: "Issue not found" }, status: :not_found unless issue
 
@@ -13,7 +10,14 @@ class MyPluginController < ApplicationController
     return render json: { error: "Test not found in the issue" }, status: :not_found unless issue_test
 
     issue_test.destroy
-    render json: { message: "#{test.summary} Test removed from issue successfully" }, status: :ok
+    return render json: { message: "#{test.summary} Test removed from issue successfully" }, status: :ok
+  end
+
+  def remove_test_from_issue
+    issue_id = params[:issue_id]
+    test_id = params[:test_id]
+
+    return MyPluginController.remove_test_from_issue(issue_id, test_id)
   end
 
   def sync_kiwi_test_cases
@@ -35,19 +39,25 @@ class MyPluginController < ApplicationController
     }, status: :ok
   end
 
-  def add_test_to_issue
-    issue = Issue.find(params[:issue_id])
-    test = Test.find_by(id: params[:test_id])
-    Rails.logger.info(">>>> test: #{test}")
+  def self.add_test_to_issue(issue_id, test_id)
+    issue = Issue.find(issue_id)
+    test = Test.find_by(id: test_id)
+    Rails.logger.info(">>>> self.add_test_to_issue: #{test}")
 
     # "IssueTest" modelini kullanarak ilişkiyi ekleyin
     IssueTest.find_or_create_by(issue: issue, test: test)
     # issue.tests << test
 
-    render json: {
+    return render json: {
              success: true,
              message: "#{issue.id} Numaralı görev için #{test.id} numaralı test eklendi.",
            }
+  end
+
+  def add_test_to_issue
+    issue_id = params[:issue_id]
+    test_id = params[:test_id]
+    return MyPluginController.add_test_to_issue(issue_id, test_id)
   end
 
   def get_issue_tests

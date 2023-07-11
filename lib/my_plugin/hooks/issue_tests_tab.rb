@@ -1,17 +1,6 @@
 module MyPlugin
   module Hooks
     class IssueTestsTab < Redmine::Hook::ViewListener
-      render_on :view_issues_form_details_bottom,
-                :inline => <<~VIEW
-                  <% Rails.logger.info(">>>> <<<<< render_on") %>
-                  <% content_for :header_tags do %>
-                    <%= javascript_include_tag 'issue_edit_test.js', :plugin => 'my_plugin' %>
-                    <%= stylesheet_link_tag 'issue_tests_tab.css', :plugin => 'my_plugin' %>
-                  <% end %>
-                  
-                  <p>ContentForInsideHook content</p>
-                VIEW
-
       def controller_issues_new_before_save(context = {})
         # set my_attribute on the issue to a default value if not set explictly
         Rails.logger.info(">>> controller_issues_new_before_save  kısmına geldik <<<")
@@ -28,10 +17,25 @@ module MyPlugin
       end
 
       def controller_issues_edit_after_save(context = {})
-        issue_id = context[:issue].id
-        test_name_input = context[:params][:test_name_input]
-        # set my_attribute on the issue to a default value if not set explictly
         Rails.logger.info(">>> controller_issues_edit_after_save  kısmına geldik <<<")
+
+        new_tests = context[:params][:test_select_input].map { |m| m.to_i }
+        old_tests = Test
+          .joins(:issue_tests)
+          .where(issue_tests: { issue_id: context[:issue].id })
+          .select(:id, :summary)
+          .pluck(:id)
+
+        removed_tests = old_tests - new_tests
+        added_tests = new_tests - old_tests
+
+        removed_tests.each do |test_id|
+          MyPluginController.remove_test_from_issue(context[:issue].id, test_id)
+        end
+
+        added_tests.each do |test_id|
+          MyPluginController.add_test_to_issue(context[:issue].id, test_id)
+        end
       end
 
       def view_issues_form_details_bottom(context = {})
@@ -44,32 +48,28 @@ module MyPlugin
             .where(issue_tests: { issue_id: issue.id })
             .select(:id, :summary)
           # seçilmiş testlet buna benzer olacak > select_options = [["Option 1", "1"], ["Option 2", "2"],...]
-          select_options = tests.map { |t| [t.summary, t.id] }
+          select_options = tests.map { |t| [t.summary, t.id, selected: "selected"] }
         end
 
+        # script_src = ActionController::Base.helpers.asset_path("my_plugin/assets/javascripts/issue_edit_test.js")
+        # script_tag = context[:controller].view_context.content_tag(:script, nil, src: script_src)
         script_src = ActionController::Base.helpers.asset_path("my_plugin/assets/javascripts/issue_edit_test.js")
-        script_tag = context[:controller].view_context.content_tag(:script, nil, src: script_src)
+        script_tag = javascript_include_tag(script_src)
 
         label_field = context[:controller].view_context.label_tag(:test_select_input, "Issue Tests", class: "test_selec_input")
-        select_field = context[:controller].view_context.select_tag(:test_select_input, options_for_select(select_options), label: "Tests", class: "test_selec_input")
-        context[:controller].view_context.content_tag(:p) do
-          script_tag + label_field + select_field
-        end
+        # select_field = context[:controller].view_context.select_tag(:test_select_input, options_for_select(select_options), label: "Tests", class: "test_selec_input")
+        select_field = context[:controller].view_context.select_tag(:test_select_input, options_for_select(select_options), { label: "Tests", class: "test_selec_input", multiple: true })
 
-        hook_caller = context[:hook_caller]
-        # If the hook was triggered by a controller action, then `hook_caller` will be the controller instance.
-        if hook_caller.is_a?(ActionController::Base)
-          controller = hook_caller
-        else
-          # If the hook was triggered by something else, then `hook_caller` will be the object that triggered the hook.
-          controller = hook_caller.controller
-        end
+        controller = context[:hook_caller].is_a?(ActionController::Base) ? context[:hook_caller] : context[:hook_caller].controller
 
         output = controller.send(:render_to_string, {
           partial: "hooks/issues/cem_deneme",
+          locals: { select_options: select_options },
         })
 
-        output.html_safe
+        context[:controller].view_context.content_tag(:p) do
+          label_field + select_field + output.html_safe
+        end
       end
 
       def view_issues_form_details_bottom2(context = {})
