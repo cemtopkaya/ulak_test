@@ -110,11 +110,11 @@ module MyPlugin
 
         result = ""
         if !added_tests.empty?
-          result += "h5. EKLENENLER\n\n* #{added_tests}\n\n"
+          result += "h5. #{l(:text_issue_tests_added)}\n\n* #{added_tests}\n\n"
         end
 
         if !removed_tests.empty?
-          result += "h5. ÇIKARILANLAR\n\n* #{removed_tests}"
+          result += "h5. #{l(:text_issue_tests_removed)}\n\n* #{removed_tests}"
         end
 
         journal = issue.init_journal(User.current)

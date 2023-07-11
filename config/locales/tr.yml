@@ -2,3 +2,5 @@
 tr:
   issue_tests: Görev Testleri
   field_issue_tests: Görev Testleri
+  text_issue_tests_added: EKLENEN
+  text_issue_tests_removed: ÇIKARILAN
