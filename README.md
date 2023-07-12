@@ -261,4 +261,18 @@ Bir eklenti ile bu kez <HEAD> etiketine CSS ve JS dosyalarını iliştirecek şe
 ![image](https://github.com/cemtopkaya/redmine_plugin_1/assets/261946/5cf6eeb4-c5a9-47bf-ade7-7bba840fa943)
 
 
+# Issue Form içinde select2 ile test ekleyebildiğimiz hali (5.0)
+
+Yeni issue oluşturulurken veya düzenlenirken testler eklenip çıkarılıyor.
+
+![image](https://github.com/cemtopkaya/my_plugin/assets/261946/c1974d2c-0f40-4e8b-b171-cde0503b51fc)
+
+![image](https://github.com/cemtopkaya/my_plugin/assets/261946/bcf24029-3091-49f0-a28b-ec9e6909581b)
+
+Ayrıca bir test ekleyip çıkarttığımızda journal olarak kayıtlara geçiyor
+
+![image](https://github.com/cemtopkaya/my_plugin/assets/261946/3b7cff83-9b1c-453e-95d8-1954b1637933)
+
+
+
 
