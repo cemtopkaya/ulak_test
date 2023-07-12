@@ -13,15 +13,28 @@ class JenkinsScriptlerApiController < ApplicationController
     render json: { result: target_servers }, status: :ok
   end
 
+  def self.get_jenkins_settings
+    unless Setting.plugin_my_plugin["jenkins_url"].blank? && Setting.plugin_my_plugin["jenkins_username"].blank? && Setting.plugin_my_plugin["jenkins_token"].blank?
+      url = Setting.plugin_my_plugin["jenkins_url"]
+      username = Setting.plugin_my_plugin["jenkins_username"]
+      token = Setting.plugin_my_plugin["jenkins_token"]
+      return {
+               :url => url,
+               :username => username,
+               :token => token,
+             }
+    else
+      Rails.logger.warning("--- Error: JENKINS INFO can't be retrieved...")
+    end
+  end
+
   def self.get_environments_by_arch(arch)
-    url = "https://jenkins-5gcn.ulakhaberlesme.com.tr/scriptler/run/servers.groovy?ARCH=#{arch}"
+    jenkins = self.get_jenkins_settings
+    url = "#{jenkins[:url]}/scriptler/run/servers.groovy?ARCH=#{arch}"
 
     # Kullanıcı adı ve token değerini değişkenlere atayın
-    kullanici_adi = "cem.topkaya"
-    token = "110b033bff6a4bed641ab76fa6f3704896"
-
     # Basic Authentication kimlik doğrulama başlığını oluşturun
-    auth_basligi = "Basic " + Base64.strict_encode64("#{kullanici_adi}:#{token}")
+    auth_basligi = "Basic " + Base64.strict_encode64("#{jenkins[:username]}:#{jenkins[:token]}")
 
     begin
       # HTTP isteği oluşturma

@@ -1,4 +1,22 @@
-<table>
+<style>
+#plugin_settings_table{
+  width: 100%;
+}
+#plugin_settings_table td:nth-child(2) {
+  width: 80%;
+}
+#plugin_settings_table input {
+  width: 100%;  
+}
+#plugin_settings_table th {
+  text-align: left;  
+}
+#plugin_settings_table thead th {
+  text-align: center;  
+}
+</style>
+
+<table id="plugin_settings_table">
   <thead>
     <tr>
     <th colspan="2">Kiwi REST API</th>
@@ -25,7 +43,7 @@
     <tr>
       <th>Password</th>
       <td>
-        <input type="text" id="settings_rest_api_password" 
+        <input type="password" id="settings_rest_api_password" 
                            value="<%= settings['rest_api_password'] %>" 
                            name="settings[rest_api_password]" >
       </td>
@@ -47,6 +65,29 @@
                            name="btn_sync_kiwi_tests" onclick="syncKiwiTests()">
       </td>
     </tr>
+    <tr>
+      <th>Jenkins URL</th>
+      <td>
+        <input type="text" id="settings_jenkins_url" 
+                           value="<%= settings['jenkins_url'] %>" 
+                           name="settings[jenkins_url]" >
+      </td>
+    </tr>
+    <tr>
+      <th>Jenkins Username</th>
+      <td>
+        <input type="text" id="settings_jenkins_username" 
+                           value="<%= settings['jenkins_username'] %>" 
+                           name="settings[jenkins_username]" >
+      </td>
+    </tr>
+    <tr>
+      <th>Jenkins TOKEN</th>
+      <td>
+        <input type="password" id="settings_jenkins_token" 
+                           value="<%= settings['jenkins_token'] %>" 
+                           name="settings[jenkins_token]" >
+      </td>
+    </tr>
   </tbody>
 </table>
-<%= MyPlugin::Kiwi.fetch_kiwi_product_categories %>

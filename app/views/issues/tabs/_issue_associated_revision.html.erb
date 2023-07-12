@@ -30,11 +30,9 @@
         </h4>
         <div class="wiki changeset-comments"><%= format_changeset_comments changeset %></div>
         <div class="wiki changeset-comments">
-          <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
-          <% if desired_artifact %>
-            <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
-            <% all_artifacts = desired_artifact[:artifacts]["distros"].flat_map { |distro| distro['artifacts'] } %>
-            <legend>
+        <div id="attributes" class="attributes">
+          <div class="splitcontent">
+
             <script>
               function open_jenkins_run(packageName, selectId){
                 const JENKINS_URL="<%= jenkins[:url] %>"
@@ -48,35 +46,62 @@
 
                 modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
               }
+
+              function updateButtonState(selectElement) {
+                var buttonElement = selectElement.nextElementSibling;
+
+                if (selectElement.value !== "") {
+                  buttonElement.disabled = false;
+                } else {
+                  buttonElement.disabled = true;
+                }
+              }
             </script>
-            <% all_artifacts.each.with_index do |artifact, index| %>
-              <% if artifact.end_with?('.deb') %>
-                <% package_name = File.basename(artifact) %>
-                <label for='<%= "select_#{changeset.format_identifier}_#{index}" %>'><%= package_name %></label>
-                <select id='<%= "select_#{changeset.format_identifier}_#{index}" %>'>
-                  <% servers.each do |option| %>
-                    <option value="<%= option %>"><%= option %></option>
-                  <% end %>
-                </select>
-                <input 
-                  type="button" 
-                  value="Yükle" 
-                  onclick="open_jenkins_run('<%= package_name %>', '<%= "select_#{changeset.format_identifier}_#{index}" %>');" />
-              <% else %>
-                <label><%= artifact %></label>
-                <button disabled>Yükle</button>
+
+          <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
+          <% if desired_artifact %>
+            <div class="splitcontentleft">
+              <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
+            </div>
+            <div class="splitcontentright">
+              <% all_artifacts = desired_artifact[:artifacts]["distros"].flat_map { |distro| distro['artifacts'] } %>
+              <legend>
+              <% all_artifacts.each.with_index do |artifact, index| %>
+                <% if artifact.end_with?('.deb') %>
+                  <% package_name = File.basename(artifact) %>
+                  <label for='<%= "select_#{changeset.format_identifier}_#{index}" %>'><%= package_name %></label>
+                  <select id='<%= "select_#{changeset.format_identifier}_#{index}" %>' onchange="updateButtonState(this)">
+                    <option value=""></option>
+                    <% servers.each do |option| %>
+                      <option value="<%= option %>"><%= option %></option>
+                    <% end %>
+                  </select>
+                  <input 
+                    type="button" 
+                    value="Yükle" 
+                    disabled
+                    onclick="open_jenkins_run('<%= package_name %>', '<%= "select_#{changeset.format_identifier}_#{index}" %>');" />
+                <% else %>
+                  <label for='<%= "select_#{changeset.format_identifier}_#{index}" %>'><%= artifact %></label>
+                  <input 
+                    type="button" 
+                    value="Yükle"  
+                    disabled
+                    onclick="open_jenkins_run('<%= package_name %>', '<%= "select_#{changeset.format_identifier}_#{index}" %>');" />
+                <% end %>
+                <hr>
               <% end %>
-              <hr>
-            <% end %>
-            </legend>
-            <pre>
-              <%= "MyPlugin::Hooks::IssueAssociatedRevision.fetch_all_packages()" %>
-            </pre>
+              </legend>
+            </div>
           <% end %>
+
+          </div>
+        </div>
         </div>
       </div>
     </div>
     <%= call_hook(:view_issues_history_changeset_bottom, { :changeset => changeset }) %>
+    <hr style="margin-bottom:50px">
   <% end %>
 </div>
 

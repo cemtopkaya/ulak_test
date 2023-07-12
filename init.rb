@@ -43,5 +43,8 @@ Redmine::Plugin.register :my_plugin do
     "rest_api_url" => options["rest_api_url"],
     "rest_api_username" => options["rest_api_username"],
     "rest_api_password" => options["rest_api_password"],
+    "jenkins_url" => options["jenkins_url"],
+    "jenkins_username" => options["jenkins_username"],
+    "jenkins_token" => options["jenkins_token"],
   }, partial: "settings/my_plugin_settings"
 end
