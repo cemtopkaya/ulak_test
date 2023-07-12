@@ -33,6 +33,42 @@
           <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
           <% if desired_artifact %>
             <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
+            <% all_artifacts = desired_artifact[:artifacts]["distros"].flat_map { |distro| distro['artifacts'] } %>
+            <legend>
+            <script>
+              function open_jenkins_run(packageName, selectId){
+                const JENKINS_URL="<%= jenkins[:url] %>"
+                const JOB="<%= jenkins[:job] %>"
+                const JOB_TOKEN="<%= jenkins[:job_token] %>"
+                const [package, version] = packageName.split('_')
+                const DEBIAN_PACKAGE=`${package}=${version}`
+                const TARGET_SERVER=$('#'+selectId).val()
+
+                const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
+
+                modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
+              }
+            </script>
+            <% all_artifacts.each.with_index do |artifact, index| %>
+              <% if artifact.end_with?('.deb') %>
+                <% package_name = File.basename(artifact) %>
+                <label for='<%= "select_#{changeset.format_identifier}_#{index}" %>'><%= package_name %></label>
+                <select id='<%= "select_#{changeset.format_identifier}_#{index}" %>'>
+                  <% servers.each do |option| %>
+                    <option value="<%= option %>"><%= option %></option>
+                  <% end %>
+                </select>
+                <input 
+                  type="button" 
+                  value="Yükle" 
+                  onclick="open_jenkins_run('<%= package_name %>', '<%= "select_#{changeset.format_identifier}_#{index}" %>');" />
+              <% else %>
+                <label><%= artifact %></label>
+                <button disabled>Yükle</button>
+              <% end %>
+              <hr>
+            <% end %>
+            </legend>
             <pre>
               <%= "MyPlugin::Hooks::IssueAssociatedRevision.fetch_all_packages()" %>
             </pre>

@@ -6,15 +6,32 @@ module MyPlugin
   module Hooks
     class IssueAssociatedRevision < Redmine::Hook::ViewListener
       def view_issues_show_details_bottom(context = {})
+        Rails.logger.info(">>> IssueAssociatedRevision.view_issues_show_details_bottom <<<<")
         issue = context[:issue]
         associated_revisions = findTagsOfCommits(issue)
+
+        # deb Paketlerini yükleyebileceğimiz sunucuların listesini çekiyoruz
+        servers = JenkinsScriptlerApiController.get_environments_by_arch("VNF")
+
+        jenkins_url = "https://jenkins-5gcn.ulakhaberlesme.com.tr"
+        job = "view/DevOps/job/DevOps/job/5GCN-Deployment"
+        job_token = "5gcn_deploy"
 
         hook_caller = context[:hook_caller]
         controller = hook_caller.is_a?(ActionController::Base) ? hook_caller : hook_caller.controller
 
         output = controller.send(:render_to_string, {
           partial: "issues/tabs/issue_associated_revision",
-          locals: { "@changesets": issue.changesets, artifacts: associated_revisions },
+          locals: {
+            "@changesets": issue.changesets,
+            artifacts: associated_revisions,
+            servers: servers,
+            jenkins: {
+              url: jenkins_url,
+              job: job,
+              job_token: job_token,
+            }
+          },
         })
 
         output
@@ -69,6 +86,13 @@ module MyPlugin
           end # < tags.each
         end # < issue.changesets&.each
         associated_revisions
+      end
+
+      def self.generate_jenkins_job_url(debian_package, target_server)
+        # Jenkins JOB URL
+        parameters = "DEBIAN_PACKAGE=#{debian_package}&openStackName=#{target_server}"
+        jenkins_job_url = "#{@JENKINS_URL}/#{@JOB}/buildWithParameters?token=#{@JOB_TOKEN}&#{parameters}"
+        jenkins_job_url
       end
 
       def self.format_artifacts_table(artifacts)
