@@ -1,3 +1,29 @@
+
+<script>
+  function open_jenkins_run(packageName, selectId){
+    const JENKINS_URL="<%= jenkins[:url] %>"
+    const JOB="<%= jenkins[:job] %>"
+    const JOB_TOKEN="<%= jenkins[:job_token] %>"
+    const [package, version] = packageName.split('_')
+    const DEBIAN_PACKAGE=`${package}=${version}`
+    const TARGET_SERVER=$('#'+selectId).val()
+
+    const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
+
+    modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
+  }
+
+  function updateButtonState(selectElement) {
+    var buttonElement = selectElement.nextElementSibling;
+
+    if (selectElement.value !== "") {
+      buttonElement.disabled = false;
+    } else {
+      buttonElement.disabled = true;
+    }
+  }
+</script>
+
 <div id="kod_surumleri">
   <% if @changesets.empty? %>
     <em>Henüz kod güncellemesi yapılmamış</em>
@@ -32,36 +58,10 @@
         <div class="wiki changeset-comments">
         <div id="attributes" class="attributes">
           <div class="splitcontent">
-
-            <script>
-              function open_jenkins_run(packageName, selectId){
-                const JENKINS_URL="<%= jenkins[:url] %>"
-                const JOB="<%= jenkins[:job] %>"
-                const JOB_TOKEN="<%= jenkins[:job_token] %>"
-                const [package, version] = packageName.split('_')
-                const DEBIAN_PACKAGE=`${package}=${version}`
-                const TARGET_SERVER=$('#'+selectId).val()
-
-                const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
-
-                modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
-              }
-
-              function updateButtonState(selectElement) {
-                var buttonElement = selectElement.nextElementSibling;
-
-                if (selectElement.value !== "") {
-                  buttonElement.disabled = false;
-                } else {
-                  buttonElement.disabled = true;
-                }
-              }
-            </script>
-
           <% desired_artifact = artifacts.find { |item| item[:changeset_id].id == changeset.id } %>
           <% if desired_artifact %>
             <div class="splitcontentleft">
-              <pre><%= MyPlugin::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
+              <pre><%= UlakTest::Hooks::IssueAssociatedRevision.format_artifacts_table(desired_artifact[:artifacts]) %></pre>
             </div>
             <div class="splitcontentright">
               <% all_artifacts = desired_artifact[:artifacts]["distros"].flat_map { |distro| distro['artifacts'] } %>
@@ -106,7 +106,7 @@
 </div>
 
 <script>
-console.log("my_plugin > issue_associated_revision");
+console.log("ulak_test > issue_associated_revision");
 
 function copyToClipboard(containerImage) {
   const textToCopy = `docker pull ${containerImage}`; // Kopyalanacak metni buraya girin
@@ -124,7 +124,7 @@ function issue_associated_revision() {
   let tabName = 'issue_associated_revision'
   let issueId=1
   url = `/issues/${issueId}?tab=test_results`;
-  remote_url = `/my_plugin/${issueId}/tab/${tabName}`;
+  remote_url = `/ulak_test/${issueId}/tab/${tabName}`;
   // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
   let $tabCodeRevisionsHeader = $("<a />", {
     id: `tab-${tabName}`,
@@ -149,7 +149,7 @@ function issue_associated_revision() {
   $tabContentCodeRevisionsHeader.appendTo($history);
 
   function testleriGetir() {
-    $.get(`/my_plugin/issues/${issueId}/tests/`).then(
+    $.get(`/ulak_test/issues/${issueId}/tests/`).then(
       tests => {
         window.$selectTests = $('#test_name_input').select2({
           tags: true,
@@ -157,7 +157,7 @@ function issue_associated_revision() {
           minimumInputLength: 1,
           data: tests,
           ajax: {
-            url: '/my_plugin/tests',
+            url: '/ulak_test/tests',
             width: '100%',
             dataType: 'json',
             delay: 250,
@@ -201,7 +201,7 @@ function issue_associated_revision() {
           console.log(e);
           var data = e.params.data;
           console.log(data);
-          $.post(`/my_plugin/issues/1/tests/${data.id}`, {}).done(r => { alert(`Test eklendi: ${r}`); });
+          $.post(`/ulak_test/issues/1/tests/${data.id}`, {}).done(r => { alert(`Test eklendi: ${r}`); });
         });
 
         window.$selectTests.on('select2:unselect', function (e) {
@@ -210,7 +210,7 @@ function issue_associated_revision() {
           var data = e.params.data;
           console.log(data);
           $.ajax({
-            url: `/my_plugin/issues/1/tests/${data.id}`,
+            url: `/ulak_test/issues/1/tests/${data.id}`,
             type: 'DELETE',
             success: function (result) {
               alert('Kayıt Silindi!');

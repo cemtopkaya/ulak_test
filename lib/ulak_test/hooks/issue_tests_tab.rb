@@ -1,7 +1,7 @@
 require "action_view"
 include ActionView::Helpers::SanitizeHelper
 
-module MyPlugin
+module UlakTest
   module Hooks
     class IssueTestsTab < Redmine::Hook::ViewListener
       def view_issues_show_details_bottom(context = {})

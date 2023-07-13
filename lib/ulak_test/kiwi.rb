@@ -1,4 +1,4 @@
-module MyPlugin
+module UlakTest
   module Kiwi
     @headers = {
       # "Cookie" => cookie, # Cookie bilgisi
@@ -14,35 +14,20 @@ module MyPlugin
     end
 
     def self.get_rest_info
-      unless Setting.plugin_my_plugin["rest_api_url"].blank? && Setting.plugin_my_plugin["rest_api_username"].blank? && Setting.plugin_my_plugin["rest_api_password"].blank?
-        url = Setting.plugin_my_plugin["rest_api_url"]
-        username = Setting.plugin_my_plugin["rest_api_username"]
-        password = Setting.plugin_my_plugin["rest_api_password"]
-        return {
-                 :url => url,
-                 :username => username,
-                 :password => password,
-               }
-      else
-        Rails.logger.warning("--- Error: REST INFO can't be retrieved...")
-      end
-    end
+      rest_api_url = Setting.plugin_ulak_test["rest_api_url"]
+      rest_api_username = Setting.plugin_ulak_test["rest_api_username"]
+      rest_api_password = Setting.plugin_ulak_test["rest_api_password"]
 
-    def self.get_rest_info
-      url = Setting.plugin_my_plugin["rest_api_url"]
-      username = Setting.plugin_my_plugin["rest_api_username"]
-      password = Setting.plugin_my_plugin["rest_api_password"]
-
-      if url.present? && username.present? && password.present?
-        {
-          :url => url,
-          :username => username,
-          :password => password,
-        }
-      else
+      if rest_api_url.blank? || rest_api_username.blank? || rest_api_password.blank?
         Rails.logger.warn("--- Error: REST INFO can't be retrieved...")
-        nil
+        return nil
       end
+
+      {
+        url: rest_api_url,
+        username: rest_api_username,
+        password: rest_api_password,
+      }
     end
 
     def self.make_request_body(method = nil, params = {})
@@ -218,7 +203,6 @@ module MyPlugin
       begin
         rest = get_rest_info()
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
-
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
         http = create_http(url)
@@ -251,7 +235,6 @@ module MyPlugin
       begin
         rest = get_rest_info()
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
-
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
         http = create_http(url)
@@ -259,6 +242,7 @@ module MyPlugin
         # POST isteği yapma
         response = http.post(url, body.to_json, @headers)
         result = JSON.parse(response.body)["result"]
+        result
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
       ensure

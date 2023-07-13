@@ -90,12 +90,14 @@ class IssueTestController < ApplicationController
     end
 
     test_case_ids = formatted_tests.pluck(:id)
-    executions = MyPlugin::Kiwi.fetch_testexecution_by_case_id_in(test_case_ids)
-
+    executions = UlakTest::Kiwi.fetch_testexecution_by_case_id_in(test_case_ids)
     formatted_tests.each { |test| test[:executions] = executions.select { |item| item[:case] == test["id"] } }
 
-    run_ids = executions.pluck(:run)
-    runs = MyPlugin::Kiwi.fetch_run_by_case_id_in(run_ids)
+    run_ids = []
+    #run_ids = executions.pluck(:run)
+    executions.select{|exec| run_ids << exec["run"] }
+    @runs = UlakTest::Kiwi.fetch_run_by_case_id_in(run_ids)
+    Rails.logger.info("test_runs>>" + runs.inspect)
 
     # runs.each > her koşunun note alanına bak
     # issue->changeset içindeki sürüme ait paket run.note alanında var mı?
@@ -103,7 +105,6 @@ class IssueTestController < ApplicationController
     @issue_data = { issue_id: issue_id, issue_tests: formatted_tests }.to_json
 
     html_content = render_to_string(
-      # /usr/src/redmine/plugins/my_plugin/app/views/my_plugin/my_template.html.erb
       template: "templates/_issue_test_results.html.erb",
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
       layout: false,

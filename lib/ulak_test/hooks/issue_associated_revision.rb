@@ -2,7 +2,7 @@ require "yaml"
 require "net/http"
 require "json"
 
-module MyPlugin
+module UlakTest
   module Hooks
     class IssueAssociatedRevision < Redmine::Hook::ViewListener
       def view_issues_show_details_bottom(context = {})
@@ -30,7 +30,7 @@ module MyPlugin
               url: jenkins_url,
               job: job,
               job_token: job_token,
-            }
+            },
           },
         })
 
@@ -153,4 +153,4 @@ module MyPlugin
       end
     end # < class IssueAssociatedRevision
   end # < module Hook
-end # < module MyPlugin
+end # < module UlakTest

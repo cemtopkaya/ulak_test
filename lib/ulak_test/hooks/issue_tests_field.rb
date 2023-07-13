@@ -1,7 +1,7 @@
 require "action_view"
 include ActionView::Helpers::SanitizeHelper
 
-module MyPlugin
+module UlakTest
   module Hooks
     class IssueTestsField < Redmine::Hook::ViewListener
       def self.upsert_issue_test(issue_id, new_test_ids)

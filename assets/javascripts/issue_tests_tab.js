@@ -1,11 +1,11 @@
-console.log("my_plugin.js");
+console.log("ulak_test.js");
 
-function my_plugin() {
+function ulak_test() {
   let { issue_id: issueId, issue_tests: issueTests } = issueData
 
   // function getRemoteTab(name, remote_url, url, load_always) {
   let name = 'test_results'
-  remote_url = `/my_plugin/${issueId}/tab/test_results`;
+  remote_url = `/ulak_test/${issueId}/tab/test_results`;
   url = `/issues/${issueId}?tab=test_results`;
   // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
   let $tabTestResultHeader = $("<a />", {
@@ -38,7 +38,7 @@ function my_plugin() {
   $tabContentTests.html($selectTests).appendTo($history);
 
   function testleriGetir() {
-    $.get(`/my_plugin/tests/issues/${issueId}`).then(
+    $.get(`/ulak_test/tests/issues/${issueId}`).then(
       tests => {
         window.$selectTests = $('#test_name_input').select2({
           tags: true,
@@ -47,7 +47,7 @@ function my_plugin() {
           data: tests,
           ajax: {
             // url: 'https://api.myjson.com/bins/444cr',
-            url: '/my_plugin/tests',
+            url: '/ulak_test/tests',
             width: '100%',
             dataType: 'json',
             delay: 250,
@@ -91,7 +91,7 @@ function my_plugin() {
           console.log(e);
           var data = e.params.data;
           console.log(data);
-          $.post(`/my_plugin/issues/1/tests/${data.id}`, {}).done(r => { alert(`Test eklendi: ${r}`); });
+          $.post(`/ulak_test/issues/1/tests/${data.id}`, {}).done(r => { alert(`Test eklendi: ${r}`); });
         });
 
         window.$selectTests.on('select2:unselect', function (e) {
@@ -100,7 +100,7 @@ function my_plugin() {
           var data = e.params.data;
           console.log(data);
           $.ajax({
-            url: `/my_plugin/issues/1/tests/${data.id}`,
+            url: `/ulak_test/issues/1/tests/${data.id}`,
             type: 'DELETE',
             success: function (result) {
               alert('Kayıt Silindi!');
@@ -131,7 +131,7 @@ function my_plugin() {
 }
 
 $(document).ready(function () {
-  my_plugin();
+  ulak_test();
 });
 
 

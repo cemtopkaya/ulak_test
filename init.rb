@@ -27,8 +27,8 @@ else
   end
 end
 
-Redmine::Plugin.register :my_plugin do
-  name "My Plugin"
+Redmine::Plugin.register :ulak_test do
+  name "Ulak Test"
   author "Your Name"
   description "A simple Redmine plugin that adds custom content to the issue details page."
   version "1.0.0"
@@ -46,5 +46,5 @@ Redmine::Plugin.register :my_plugin do
     "jenkins_url" => options["jenkins_url"],
     "jenkins_username" => options["jenkins_username"],
     "jenkins_token" => options["jenkins_token"],
-  }, partial: "settings/my_plugin_settings"
+  }, partial: "settings/ulak_test_settings"
 end

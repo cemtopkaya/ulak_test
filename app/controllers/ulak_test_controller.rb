@@ -1,4 +1,4 @@
-class MyPluginController < ApplicationController
+class UlakTestController < ApplicationController
   def index
     issue = Issue.find(params[:issue_id])
     Rails.logger.info(">>>>> issue : #{issue}")
@@ -10,7 +10,7 @@ class MyPluginController < ApplicationController
     }
 
     html_content = render_to_string(
-      # /usr/src/redmine/plugins/my_plugin/app/views/my_plugin/my_template.html.erb
+      # /usr/src/redmine/plugins/ulak_test/app/views/ulak_test/my_template.html.erb
       template: "templates/test_results.html.erb",
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
       layout: false,

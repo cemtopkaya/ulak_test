@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'issue_edit_test.js', :plugin => 'my_plugin' %>
+<%= javascript_include_tag 'issue_edit_test.js', :plugin => 'ulak_test' %>
 
 <% content_for :p do %>
   <h1>Merhaba Uranüs</h1>
@@ -57,7 +57,7 @@ function initSelect2() {
     multiple: true,
     minimumInputLength: 2,
     ajax: {
-      url: '/my_plugin/tests',
+      url: '/ulak_test/tests',
       width: '100%',
       dataType: 'json',
       delay: 250,

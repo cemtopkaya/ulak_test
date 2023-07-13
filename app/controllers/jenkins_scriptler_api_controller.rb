@@ -14,18 +14,20 @@ class JenkinsScriptlerApiController < ApplicationController
   end
 
   def self.get_jenkins_settings
-    unless Setting.plugin_my_plugin["jenkins_url"].blank? && Setting.plugin_my_plugin["jenkins_username"].blank? && Setting.plugin_my_plugin["jenkins_token"].blank?
-      url = Setting.plugin_my_plugin["jenkins_url"]
-      username = Setting.plugin_my_plugin["jenkins_username"]
-      token = Setting.plugin_my_plugin["jenkins_token"]
-      return {
-               :url => url,
-               :username => username,
-               :token => token,
-             }
-    else
-      Rails.logger.warning("--- Error: JENKINS INFO can't be retrieved...")
+    jenkins_url = Setting.plugin_ulak_test["jenkins_url"]
+    jenkins_username = Setting.plugin_ulak_test["jenkins_username"]
+    jenkins_token = Setting.plugin_ulak_test["jenkins_token"]
+
+    if jenkins_url.blank? || jenkins_username.blank? || jenkins_token.blank?
+      Rails.logger.warn("--- Error: JENKINS INFO can't be retrieved...")
+      return nil
     end
+
+    {
+      url: jenkins_url,
+      username: jenkins_username,
+      token: jenkins_token,
+    }
   end
 
   def self.get_environments_by_arch(arch)
