@@ -43,7 +43,6 @@ Redmine::Plugin.register :ulak_test do
     "rest_api_url" => ayarlar["rest_api_url"],
     "rest_api_username" => ayarlar["rest_api_username"],
     "rest_api_password" => ayarlar["rest_api_password"],
-    "cenk_cem" => ayarlar["cenk_cem"],
     "jenkins_url" => ayarlar["jenkins_url"],
     "jenkins_username" => ayarlar["jenkins_username"],
     "jenkins_token" => ayarlar["jenkins_token"],
