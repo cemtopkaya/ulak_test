@@ -37,14 +37,21 @@ Redmine::Plugin.register :ulak_test do
   requires_redmine :version_or_higher => "4.0.0"
 
   PLUGIN_ROOT = Pathname.new(__FILE__).join("..").realpath.to_s
-  options = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
+  ayarlar = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
 
-  settings default: {
-    "rest_api_url" => options["rest_api_url"],
-    "rest_api_username" => options["rest_api_username"],
-    "rest_api_password" => options["rest_api_password"],
-    "jenkins_url" => options["jenkins_url"],
-    "jenkins_username" => options["jenkins_username"],
-    "jenkins_token" => options["jenkins_token"],
-  }, partial: "settings/ulak_test_settings"
+  settings :default => {
+    "rest_api_url" => ayarlar["rest_api_url"],
+    "rest_api_username" => ayarlar["rest_api_username"],
+    "rest_api_password" => ayarlar["rest_api_password"],
+    "cenk_cem" => ayarlar["cenk_cem"],
+    "jenkins_url" => ayarlar["jenkins_url"],
+    "jenkins_username" => ayarlar["jenkins_username"],
+    "jenkins_token" => ayarlar["jenkins_token"],
+    "deployment_job_path" => ayarlar["deployment_job_path"],
+    "deployment_job_token" => ayarlar["deployment_job_token"],
+  }, partial: "settings/ulak_test_eklenti_settings.html"
+
+  @settings = settings
+
+  puts settings
 end

@@ -118,12 +118,9 @@ class IssueCodeArtifactsController < ApplicationController
     issue = Issue.find(issue_id)
     code_revisions = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
+    jenkins = UlakTest::Jenkins.get_jenkins_settings
     vnf_servers = UlakTest::Jenkins.get_environments_by_arch("VNF")
     cnf_servers = UlakTest::Jenkins.get_environments_by_arch("CNF")
-
-    jenkins_url = "https://jenkins-5gcn.ulakhaberlesme.com.tr"
-    job = "view/DevOps/job/DevOps/job/5GCN-Deployment"
-    job_token = "5gcn_deploy"
 
     html_content = render_to_string(
       template: "templates/_tab_content_issue_code_artifacts.html.erb",
@@ -136,9 +133,9 @@ class IssueCodeArtifactsController < ApplicationController
         vnf_servers: vnf_servers,
         cnf_servers: cnf_servers,
         jenkins: {
-          url: jenkins_url,
-          job: job,
-          job_token: job_token,
+          url: jenkins[:url],
+          job: jenkins[:deployment_job_path],
+          job_token: jenkins[:deployment_job_token],
         },
       },
     )

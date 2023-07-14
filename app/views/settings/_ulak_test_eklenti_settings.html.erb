@@ -1,0 +1,107 @@
+<style>
+  #plugin_settings_table {
+    width: 100%;
+  }
+
+  #plugin_settings_table td:nth-child(2) {
+    width: 80%;
+  }
+
+  #plugin_settings_table input {
+    width: 100%;
+  }
+
+  #plugin_settings_table th {
+    text-align: left;
+  }
+
+  #plugin_settings_table thead th {
+    text-align: center;
+  }
+</style>
+
+<table id="plugin_settings_table">
+  <thead>
+    <tr>
+      <th colspan="2">Kiwi REST API</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th>URL</th>
+      <td>
+        <%= text_field_tag "settings_rest_api_url", @settings["rest_api_url"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>cenk</th>
+      <td>
+        <%= text_field_tag "settings_cenk_cem", @settings["cenk_cem"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Username</th>
+      <td>
+        <%= text_field_tag "settings_rest_api_username", @settings["rest_api_username"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Password</th>
+      <td>
+        <%= password_field_tag "settings_rest_api_password", @settings["rest_api_password"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Sync Kiwi Tests</th>
+      <td>
+        <script>
+          function syncKiwiTests() {
+            $.get("/ulak_test/tests/sync", function(data) {
+              console.log(data);
+              mesaj = `${data.after - data.before} Kayıt eklendi`
+              alert("Eşleştirme başarıyla tamamlandı.\n", mesaj);
+            });
+          }
+        </script>
+        <%= button_tag "Sync Kiwi Tests", type: "button", name: "btn_sync_kiwi_tests", onclick: "syncKiwiTests()" %>
+      </td>
+    </tr>
+    <tr>
+      <th colspan="2" style="text-align:center">Jenkins Settings</th>
+    </tr>
+    <tr>
+      <th>Jenkins URL</th>
+      <td>
+        <%= text_field_tag "settings_jenkins_url", @settings["jenkins_url"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Jenkins Username</th>
+      <td>
+        <%= text_field_tag "settings_jenkins_username", @settings["jenkins_username"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Jenkins TOKEN</th>
+      <td>
+        <%= password_field_tag "settings_jenkins_token", @settings["jenkins_token"] %>
+      </td>
+    </tr>
+    <tr>
+      <th colspan="2" style="text-align:center">Jenkins Deployment Job</th>
+    </tr>
+    <tr>
+      <th>URL Path</th>
+      <td>
+        <%= text_field_tag "settings_deployment_job_path", @settings["deployment_job_path"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>Token</th>
+      <td>
+        <%= text_field_tag "settings_deployment_job_token", @settings["deployment_job_token"] %>
+      </td>
+    </tr>
+  </tbody>
+</table>
