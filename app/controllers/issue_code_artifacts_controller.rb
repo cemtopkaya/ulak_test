@@ -1,4 +1,4 @@
-class IssueTestController < ApplicationController
+class IssueCodeArtifactsController < ApplicationController
   def remove_test_from_issue
     issue_id = params[:issue_id]
     test_id = params[:test_id]
@@ -103,7 +103,7 @@ class IssueTestController < ApplicationController
   # Test senaryolarının execute edilen koşuları bulur ve bu koşuların etiketlerinde geçen
   # paket_adı=versiyon değerini arar. Bulduklarını paketin olduğu test sonuçları olarak görüntüler.
 
-  def view_issue_test_results
+  def view_issue_code_artifacts
     # 1. issue_id ile ilişkili test senaryolarını getir
     # 2. test senaryolarının çalıştırıldığı koşuları bul
     # 3. koşuların etiketlerinde paketi ara (paketin olduğu koşuları süz)
@@ -116,23 +116,30 @@ class IssueTestController < ApplicationController
       .where(issue_tests: { issue_id: issue_id })
       .select(:test_case_id, :summary)
     issue = Issue.find(issue_id)
-    changesets = UlakTest::Git.findTagsOfCommits(issue.changesets)
+    code_revisions = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
-    # html_content = controller.send(:render_to_string, {
-    #   partial: "templates/_issue_test_results.html.erb",
-    #   layout: false,
-    #   locals: {
-    #     changesets: changesets,
-    #   },
-    # })
+    vnf_servers = UlakTest::Jenkins.get_environments_by_arch("VNF")
+    cnf_servers = UlakTest::Jenkins.get_environments_by_arch("CNF")
+
+    jenkins_url = "https://jenkins-5gcn.ulakhaberlesme.com.tr"
+    job = "view/DevOps/job/DevOps/job/5GCN-Deployment"
+    job_token = "5gcn_deploy"
+
     html_content = render_to_string(
-      template: "templates/_tab_content_issue_test_results.html.erb",
+      template: "templates/_tab_content_issue_code_artifacts.html.erb",
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
       layout: false,
       locals: {
-        changesets: changesets,
         issue_id: issue_id,
+        code_revisions: code_revisions,
         tests: tests,
+        vnf_servers: vnf_servers,
+        cnf_servers: cnf_servers,
+        jenkins: {
+          url: jenkins_url,
+          job: job,
+          job_token: job_token,
+        },
       },
     )
     render html: html_content

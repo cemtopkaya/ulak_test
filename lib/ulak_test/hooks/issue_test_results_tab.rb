@@ -3,9 +3,9 @@ include ActionView::Helpers::SanitizeHelper
 
 module UlakTest
   module Hooks
-    class IssueTestsTab < Redmine::Hook::ViewListener
+    class IssueTestResultsTab < Redmine::Hook::ViewListener
       def view_issues_show_details_bottom(context = {})
-        Rails.logger.info(">>> IssueTestsTab.view_issues_show_details_bottom <<<<")
+        Rails.logger.info(">>> IssueTestResultsTab.view_issues_show_details_bottom <<<<")
         issue = context[:issue]
         return render json: { error: "Issue not found" }, status: :not_found unless issue
 
@@ -16,13 +16,22 @@ module UlakTest
 
         issue_data = { tests: tests, issue_id: issue.id }
 
-        if !tests.blank?
+        unless tests.blank?
           hook_caller = context[:hook_caller]
           controller = hook_caller.is_a?(ActionController::Base) ? hook_caller : hook_caller.controller
 
           output = controller.send(:render_to_string, {
-            partial: "issues/tabs/issue_test_results",
-            locals: { issue_data: issue_data.to_json },
+            partial: "issues/tabs/tab_issue_test_results",
+            locals: {
+                      tab_issue_assoc_revisions: {
+                        issue_data: issue_data.to_json,
+                      },
+                      tab_test_results: {
+                        issue_id: issue.id,
+                        issue: issue,
+                        tests: tests.to_json,
+                      },
+                    },
           })
 
           output

@@ -8,13 +8,13 @@
     <div id="all_attributes">
       <ol>
         <% 
-            issue_data = JSON.parse(@issue_data)
-            issue_data["issue_tests"].each do |test| 
+            # issue_data = JSON.parse(@issue_data)
+            # issue_data["issue_tests"].each do |test| 
+            tests.each do |test| 
         %>
           <li>
-          PAKET VAR - <%= test["text"] %>
+          PAKET VAR - <%= test["summary"] %>
             <ol>
-            <li>Koşu 21 &check;</li>
             <li>Koşu 19 &#215;</li>
             </ol>
           </li>

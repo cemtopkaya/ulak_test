@@ -190,35 +190,6 @@ module UlakTest
       result
     end
 
-    def self.fetch_testexecution_by_case_id_in(case_ids)
-      # parametre türünü belirtme
-      # @param [Array] case_ids
-      unless case_ids.is_a?(Array)
-        raise ArgumentError, "case_ids parameter must be an array"
-      end
-
-      result = nil
-      login()
-
-      begin
-        rest = get_rest_info()
-        body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
-        # HTTP isteği oluşturma
-        url = rest.fetch(:url)
-        http = create_http(url)
-
-        # POST isteği yapma
-        response = http.post(url, body.to_json, @headers)
-        result = JSON.parse(response.body)["result"]
-      rescue StandardError => e
-        puts "----- Error occurred: #{e.message}"
-      ensure
-        logout()
-      end
-
-      result
-    end
-
     # ID değerleri verilen test durumlarının (test case) koşturulduğu
     # ve sonuçlarında koşunun durumunu dönecek fonksiyon.
 
@@ -252,6 +223,73 @@ module UlakTest
       result
     end
 
+    # RUN ID değerleri içinde etiketleri arar
+
+    # @param [Array<Integer>] Test koşumlarının ID değerlerini içeren dizi
+    # @param [String] Etiket adı içerisinde paket_adı=versiyonu değeri gelecek
+    # @return [String] ???
+    def self.fetch_tags_by_run_id(run_ids, tag_name)
+      unless run_ids.is_a?(Array)
+        raise ArgumentError, "run_ids parameter must be an array"
+      end
+
+      if tag_name.empty?
+        raise ArgumentError, "tag_name parameter must be a string"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_rest_info()
+        body = make_request_body("Tag.filter", [{ :run__id__in => run_ids, :name => tag_name }])
+        # HTTP isteği oluşturma
+        url = rest.fetch(:url)
+        http = create_http(url)
+
+        # POST isteği yapma
+        response = http.post(url, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
+      result
+    end
+
+    # RUN ID değerleri içinde etiketleri arar
+
+    # @param [String] tag_name ile etiket adı gelir
+    # @param [String] Etiket adı içerisinde paket_adı=versiyonu değeri gelecek
+    # @return [String]
+    def self.fetch_tags_by_tag_name(tag_name)
+      if tag_name.empty?
+        raise ArgumentError, "tag_name parameter must be a string"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_rest_info()
+        body = make_request_body("Tag.filter", [{ :name => tag_name }])
+        # HTTP isteği oluşturma
+        url = rest.fetch(:url)
+        http = create_http(url)
+
+        # POST isteği yapma
+        response = http.post(url, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
+      result
+    end
     # Case ID değerleri için yapılan testler
 
     # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi

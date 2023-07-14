@@ -1,14 +1,11 @@
-<!--h1>test ister misin1</h1-->
-
 <script>
-console.log("ulak_test.js");
+console.log("ulak_test-> Görevin Kod Çıktıları Sekmesi");
 
 $(document).ready(function () {
-  issueData = <%= raw issue_data %>
-  let { tests:tests, issue_id: issueId } = issueData
-  let tabName = 'test_results'
-  let tabHeaderId = 'tab-test_results'
-  let tabContentId = 'tab-content-test_results'
+  let issueId = <%= issue_id %>
+  let tabName = 'code_artifacts'
+  let tabHeaderId = 'tab-code_artifacts'
+  let tabContentId = 'tab-content-code_artifacts'
   let url = `/issues/${issueId}?tab=${tabName}`;
   let remote_url = `/ulak_test/issues/${issueId}/tab/${tabName}`;
 
@@ -19,7 +16,7 @@ $(document).ready(function () {
       class: "",
       onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
       href: `/issues/${issueId}?tab=${tabName}`,
-      text: "Test Results"
+      text: '<%= l(:text_issue_code_artifacs) %>'
     });
 
     return $('<li>').html($tabTestResultHeader)
@@ -29,18 +26,21 @@ $(document).ready(function () {
     let $tabContentCodeRevisionsHeader = $('<div>', {
       id: `${tabContentId}`,
       class: 'tab-content',
-      title: 'Test result will be shown here',
+      title: 'Code Artifacts will be shown here',
       style: 'display: none;'
     })
 
     return $tabContentCodeRevisionsHeader
   }
 
-  if(tests && Array.isArray(tests) && tests.length > 0){
+  <% unless changesets.nil? %>
     let $history = $('#history')
     let $history_ul = $history.find('div.tabs ul')
     $history_ul.append(createTabHeader());
     $history.append(createTabContent());
-  }
+  <% end %>
 });
 </script>
+
+
+

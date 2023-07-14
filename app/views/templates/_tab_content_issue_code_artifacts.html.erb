@@ -1,0 +1,109 @@
+<div id="kod_surumleri">
+  <% if code_revisions.empty? %>
+    <em>Henüz kod güncellemesi yapılmamış</em>
+  <% end %>
+
+  <%
+     code_revisions.each do |cs| 
+       changeset = cs[:changeset]
+       artifacts_metadata = cs[:artifacts_metadata]
+       artifacts = cs[:artifacts]
+  %>
+    <div id="changeset-<%= changeset.id %>" class="changeset journal">
+      <div class="note">
+        <h4 class='note-header'>
+          <div class="contextual">
+            <%# <%= link_to_revision(changeset, changeset.repository, :text => "#{l(:label_revision)} #{changeset.format_identifier}") %> %>
+            <%= "#{l(:label_revision)} #{changeset.format_identifier}" %>
+            <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
+              (<%= link_to(l(:label_diff),
+                           controller: "repositories",
+                           action: "diff",
+                           id: changeset.project,
+                           repository_id: changeset.repository.identifier_param,
+                           path: "",
+                           rev: changeset.identifier) %>)
+            <% end %>
+          </div>
+
+          <div>
+            <%= avatar(changeset.user, size: "24") %>
+            <%= authoring changeset.committed_on, changeset.author, label: :label_added_time_by %>
+          </div>
+        </h4>
+
+
+        <div class="wiki changeset-comments"><%= format_changeset_comments changeset %></div>
+
+        <% unless artifacts.nil? %>
+          <div class="wiki changeset-comments">
+            <div id="attributes" class="attributes">
+              <div class="splitcontent">
+                <!-- YAML olarak TAG Description -->
+                <div class="splitcontentleft">
+                  <pre><%= UlakTest::Hooks::IssueCodeArtifactsTab.format_artifacts_table(artifacts_metadata) unless artifacts_metadata.nil? %></pre>
+                </div>
+                <!-- Her artifact için yükleme satırı -->
+                <div class="splitcontentright">
+                  <legend>
+                    <% unless artifacts.nil? %>
+                      <% artifacts&.each.with_index do |artifact, index| %>
+                        <% if artifact.end_with?('.deb')
+                            package_name = File.basename(artifact) 
+                            select_id = "select_#{changeset.format_identifier}_#{index}"
+                        %>
+                          <%= label_tag "#{select_id}", package_name %>
+                          <%= select_tag "#{select_id}", options_for_select([""] + vnf_servers), onchange: "updateButtonState(this)" %>
+                          <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{package_name}', '#{select_id}');" %>
+                          <br/>
+                        <% else %>
+                        
+                          <%= label_tag "#{select_id}", artifact %>
+                          <%= select_tag "#{select_id}", options_for_select([""] + cnf_servers) %>
+                          <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{artifact}', '#{select_id}');" %>
+
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                    <hr>
+                  </legend>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
+    <%= call_hook(:view_issues_history_changeset_bottom, { changeset: changeset }) %>
+    <hr style="margin-bottom:50px">
+  <% end %>
+</div>
+
+
+
+<script>
+  function open_jenkins_run(packageName, selectId){
+    const JENKINS_URL="<%= jenkins[:url] %>"
+    const JOB="<%= jenkins[:job] %>"
+    const JOB_TOKEN="<%= jenkins[:job_token] %>"
+    const [package, version] = packageName.split('_')
+    const DEBIAN_PACKAGE=`${package}=${version}`
+    const TARGET_SERVER=$('#'+selectId).val()
+
+    const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
+
+    modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
+  }
+
+  function updateButtonState(selectElement) {
+    var buttonElement = selectElement.nextElementSibling;
+
+    if (selectElement.value !== "") {
+      buttonElement.disabled = false;
+    } else {
+      buttonElement.disabled = true;
+    }
+  }
+</script>

@@ -1,6 +1,0 @@
-<% if context[:issue].new_record? %>
-  <%= context[:form].label :my_custom_field, 'My Custom Field' %>
-  <%= context[:form].select :my_custom_field, options_for_select([['Option 1', '1'], ['Option 2', '2'], ['Option 3', '3']]), {}, { multiple: true } %>
-<% else %>
-  <%# Diğer durumlar için gerekli olan kodları buraya ekleyin %>
-<% end %>

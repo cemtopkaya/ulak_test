@@ -1,0 +1,44 @@
+<script>
+console.log("ulak_test-> Görevin Test Sonuçları Sekmesi");
+
+$(document).ready(function () {
+  let issueId = <%= tab_test_results[:issue_id] %>
+  let tests = <%= raw tab_test_results[:tests] %>
+  let tabName = 'test_results'
+  let tabHeaderId = 'tab-test_results'
+  let tabContentId = 'tab-content-test_results'
+  let url = `/issues/${issueId}?tab=${tabName}`;
+  let remote_url = `/ulak_test/issues/${issueId}/tab/${tabName}`;
+
+  function createTabHeader($history_ul) {
+    // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim
+    let $tabTestResultHeader = $("<a />", {
+      id: `${tabHeaderId}`,
+      class: "",
+      onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
+      href: `/issues/${issueId}?tab=${tabName}`,
+      text: "Test Results"
+    });
+
+    return $('<li>').html($tabTestResultHeader)
+  }
+
+  function createTabContent() {
+    let $tabContentCodeRevisionsHeader = $('<div>', {
+      id: `${tabContentId}`,
+      class: 'tab-content',
+      title: 'Test result will be shown here',
+      style: 'display: none;'
+    })
+
+    return $tabContentCodeRevisionsHeader
+  }
+
+  if(tests && Array.isArray(tests) && tests.length > 0){
+    let $history = $('#history')
+    let $history_ul = $history.find('div.tabs ul')
+    $history_ul.append(createTabHeader());
+    $history.append(createTabContent());
+  }
+});
+</script>
