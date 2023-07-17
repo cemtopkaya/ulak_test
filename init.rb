@@ -39,6 +39,7 @@ Redmine::Plugin.register :ulak_test do
   PLUGIN_ROOT = Pathname.new(__FILE__).join("..").realpath.to_s
   ayarlar = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
 
+  Setting.clear_cache
   settings :default => {
     "rest_api_url" => ayarlar["rest_api_url"],
     "rest_api_username" => ayarlar["rest_api_username"],

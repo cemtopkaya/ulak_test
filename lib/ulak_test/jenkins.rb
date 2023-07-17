@@ -1,6 +1,7 @@
 module UlakTest
   module Jenkins
     def self.get_jenkins_settings
+      Setting.clear_cache
       jenkins_url = Setting.plugin_ulak_test["jenkins_url"]
       jenkins_username = Setting.plugin_ulak_test["jenkins_username"]
       jenkins_token = Setting.plugin_ulak_test["jenkins_token"]
@@ -17,7 +18,7 @@ module UlakTest
         username: jenkins_username,
         token: jenkins_token,
         deployment_job_path: deployment_job_path,
-        deployment_job__token: deployment_job_token,
+        deployment_job_token: deployment_job_token,
       }
     end
 

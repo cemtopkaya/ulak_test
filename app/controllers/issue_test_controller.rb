@@ -119,13 +119,6 @@ class IssueTestController < ApplicationController
     issue = Issue.find(issue_id)
     commit_with_artifacst = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
-    # html_content = controller.send(:render_to_string, {
-    #   partial: "templates/_issue_test_results.html.erb",
-    #   layout: false,
-    #   locals: {
-    #     changesets: changesets,
-    #   },
-    # })
     html_content = render_to_string(
       template: "templates/_tab_content_issue_test_results.html.erb",
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız

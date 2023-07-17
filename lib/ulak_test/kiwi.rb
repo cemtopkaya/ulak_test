@@ -14,6 +14,7 @@ module UlakTest
     end
 
     def self.get_rest_info
+      Setting.clear_cache
       rest_api_url = Setting.plugin_ulak_test["rest_api_url"]
       rest_api_username = Setting.plugin_ulak_test["rest_api_username"]
       rest_api_password = Setting.plugin_ulak_test["rest_api_password"]
