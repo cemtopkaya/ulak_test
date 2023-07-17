@@ -115,8 +115,9 @@ class IssueTestController < ApplicationController
       .joins(:issue_tests)
       .where(issue_tests: { issue_id: issue_id })
       .select(:test_case_id, :summary)
+
     issue = Issue.find(issue_id)
-    changesets = UlakTest::Git.findTagsOfCommits(issue.changesets)
+    commit_with_artifacst = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
     # html_content = controller.send(:render_to_string, {
     #   partial: "templates/_issue_test_results.html.erb",
@@ -130,7 +131,7 @@ class IssueTestController < ApplicationController
       # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
       layout: false,
       locals: {
-        changesets: changesets,
+        commit_with_artifacst: commit_with_artifacst,
         issue_id: issue_id,
         tests: tests,
       },

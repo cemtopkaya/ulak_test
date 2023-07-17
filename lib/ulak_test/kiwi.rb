@@ -228,7 +228,7 @@ module UlakTest
     # @param [Array<Integer>] Test koşumlarının ID değerlerini içeren dizi
     # @param [String] Etiket adı içerisinde paket_adı=versiyonu değeri gelecek
     # @return [String] ???
-    def self.fetch_tags_by_run_id(run_ids, tag_name)
+    def self.fetch_tags_by_run_ids(run_ids, tag_name)
       unless run_ids.is_a?(Array)
         raise ArgumentError, "run_ids parameter must be an array"
       end

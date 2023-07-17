@@ -13,7 +13,6 @@
       <div class="note">
         <h4 class='note-header'>
           <div class="contextual">
-            <%# <%= link_to_revision(changeset, changeset.repository, :text => "#{l(:label_revision)} #{changeset.format_identifier}") %> %>
             <%= "#{l(:label_revision)} #{changeset.format_identifier}" %>
             <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
               (<%= link_to(l(:label_diff),
