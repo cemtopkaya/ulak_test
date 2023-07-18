@@ -273,6 +273,16 @@ Ayrıca bir test ekleyip çıkarttığımızda journal olarak kayıtlara geçiyo
 
 ![image](https://github.com/cemtopkaya/my_plugin/assets/261946/3b7cff83-9b1c-453e-95d8-1954b1637933)
 
+# Issue Test'lerinin Sonuçları Kiwi'den Çekilir (6.0)
+
+![image](https://github.com/cemtopkaya/my_plugin/assets/261946/eaadf905-3f54-4862-91af-69d1e1121238)
+
+Kod değişimlerinden üretilen paketlerin Jenkins api üzerinden kurulumları sağlandı.
+
+![image](https://github.com/cemtopkaya/my_plugin/assets/261946/4db0e663-7112-4a68-89bd-c35cdab33f55)
+
+
+
 
 
 
