@@ -17,7 +17,7 @@ $(document).ready(function () {
       class: "",
       onclick: `getRemoteTab('${tabName}', '${remote_url}', '${url}'); return false;`,
       href: `/issues/${issueId}?tab=${tabName}`,
-      text: "Test Results"
+      text: '<%= l(:text_issue_test_results) %>'
     });
 
     return $('<li>').html($tabTestResultHeader)
