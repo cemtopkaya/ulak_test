@@ -1,4 +1,21 @@
 class IssueCodeArtifactsController < ApplicationController
+  
+  def get_tag_artifact_metadata
+    puts ">>>>>>>>>> get_tag_artifact_metadata.............."
+    issue_id = params[:issue_id]
+    changeset_id = params[:changeset_id].to_i
+    tag = params[:tag]
+
+    issue = Issue.find_by_id(issue_id)
+    changeset = issue.changesets.find { |cs| cs.id == changeset_id }
+    repository_url = changeset.repository.url
+
+    artifacts_metadata = UlakTest::Git.tag_artifacts_metadata(repository_url, tag)
+    
+    # artifacts_metadata = UlakTest::Git.tag_artifacts_metadata(issue_id, changeset.id, tag)
+    render json: artifacts_metadata
+  end
+
   def remove_test_from_issue
     issue_id = params[:issue_id]
     test_id = params[:test_id]

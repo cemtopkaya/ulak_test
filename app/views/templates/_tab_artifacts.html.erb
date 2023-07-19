@@ -1,0 +1,40 @@
+
+        <% unless artifacts.nil? %>
+          <div class="wiki changeset-comments">
+            <div id="attributes" class="attributes">
+              <div class="splitcontent">
+                <!-- YAML olarak TAG Description -->
+                <div class="splitcontentleft">
+                  <pre><%= UlakTest::Hooks::IssueCodeArtifactsTab.format_artifacts_table(artifacts_metadata) unless artifacts_metadata.nil? %></pre>
+                </div>
+                <!-- Her artifact için yükleme satırı -->
+                <div class="splitcontentright">
+                  <legend>
+                    <% unless artifacts.nil? %>
+                      <% artifacts&.each.with_index do |artifact, index| %>
+                        <% if artifact.end_with?('.deb')
+                            package_name = File.basename(artifact) 
+                            select_id = "select_#{changeset.format_identifier}_#{index}"
+                        %>
+                          <%= label_tag "#{select_id}", package_name %>
+                          <%= select_tag "#{select_id}", options_for_select([""] + vnf_servers), onchange: "updateButtonState(this)" %>
+                          <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{package_name}', '#{select_id}');" %>
+                          <br/>
+                        <% else %>
+                        
+                          <%= label_tag "#{select_id}", artifact %>
+                          <%= select_tag "#{select_id}", options_for_select([""] + cnf_servers) %>
+                          <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{artifact}', '#{select_id}');" %>
+
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                    <hr>
+                  </legend>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        <% end %>
+
