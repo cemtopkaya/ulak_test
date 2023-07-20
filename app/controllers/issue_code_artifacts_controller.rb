@@ -7,13 +7,20 @@ class IssueCodeArtifactsController < ApplicationController
     tag = params[:tag]
 
     issue = Issue.find_by_id(issue_id)
-    changeset = issue.changesets.find { |cs| cs.id == changeset_id }
-    repository_url = changeset.repository.url
+    @changeset = issue.changesets.find { |cs| cs.id == changeset_id }
+    repository_url = @changeset.repository.url
 
-    artifacts_metadata = UlakTest::Git.tag_artifacts_metadata(repository_url, tag)
-    
-    # artifacts_metadata = UlakTest::Git.tag_artifacts_metadata(issue_id, changeset.id, tag)
-    render json: artifacts_metadata
+    @jenkins = UlakTest::Jenkins.get_jenkins_settings
+    @vnf_servers = UlakTest::Jenkins.get_environments_by_arch("VNF")
+    @cnf_servers = UlakTest::Jenkins.get_environments_by_arch("CNF")
+    @artifacts_metadata = UlakTest::Git.tag_artifacts_metadata(repository_url, tag)
+    @artifacts = @artifacts_metadata&.dig("distros")&.map { |cs| cs["artifacts"] }&.compact&.flatten || []
+
+    html_content = render_to_string(
+      template: "templates/_tab_content_issue_code_artifacts_metadata_install.html.erb",
+      layout: false,
+    )
+    render html: html_content
   end
 
   def remove_test_from_issue

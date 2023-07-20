@@ -1,0 +1,69 @@
+<% unless @artifacts.nil? %>
+  <div class="wiki changeset-comments">
+    <div id="attributes" class="attributes">
+      <div class="splitcontent">
+        <% if @artifacts.empty? %>
+          <pre><%= "#{l(:text_git_tag_description_empty)}" %></pre>
+        <% else %>
+        <!-- YAML olarak TAG Description -->
+        <div class="splitcontentleft">
+          <pre><%= UlakTest::Hooks::IssueCodeArtifactsTab.format_artifacts_table(@artifacts_metadata) unless @artifacts_metadata.nil? %></pre>
+        </div>
+        <!-- Her artifact için yükleme satırı -->
+        <div class="splitcontentright">
+          <legend>
+
+            <% @artifacts&.each.with_index do |artifact, index| %>
+
+              <% if artifact.end_with?('.deb')
+                  package_name = File.basename(artifact) 
+                  select_id = "select_#{@changeset.format_identifier}_#{index}"
+              %>
+                <%= label_tag "#{select_id}", package_name %>
+                <%= select_tag "#{select_id}", options_for_select([""] + @vnf_servers), onchange: "updateButtonState(this)" %>
+                <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{package_name}', '#{select_id}');" %>
+                <br/>
+              <% else %>
+                <%= label_tag "#{select_id}", artifact %>
+                <%= select_tag "#{select_id}", options_for_select([""] + @cnf_servers) %>
+                <%= button_tag "Yükle", type: "button", disabled: true, onclick: "open_jenkins_run('#{artifact}', '#{select_id}');" %>
+              <% end %>
+
+            <% end %> 
+          </legend>
+          <hr>
+        </div>
+        
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+<% end %>
+
+
+
+<script>
+  function open_jenkins_run(packageName, selectId){
+    const JENKINS_URL="<%= @jenkins[:url] %>"
+    const JOB="<%= @jenkins[:job] %>"
+    const JOB_TOKEN="<%= @jenkins[:job_token] %>"
+    const [package, version] = packageName.split('_')
+    const DEBIAN_PACKAGE=`${package}=${version}`
+    const TARGET_SERVER=$('#'+selectId).val()
+
+    const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
+
+    modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
+  }
+
+  function updateButtonState(selectElement) {
+    var buttonElement = selectElement.nextElementSibling;
+
+    if (selectElement.value !== "") {
+      buttonElement.disabled = false;
+    } else {
+      buttonElement.disabled = true;
+    }
+  }
+</script>

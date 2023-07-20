@@ -6,3 +6,4 @@ tr:
   text_issue_tests_removed: ÇIKARILAN
   text_issue_code_artifacs: Kod Çıktıları
   text_issue_test_results: Test Sonuçları
+  text_git_tag_description_empty: Etiketin açıklamasında üretilen çıktı bilgisine erişilemedi

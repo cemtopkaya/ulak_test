@@ -31,12 +31,13 @@ module UlakTest
       puts ">>>> git_cat_command: #{git_cat_command}"
       git_cat_output = `#{git_cat_command}`
 
-      # Eğer etiket varsa açıklamayı alın, yoksa "No description" yazın
-      description = git_cat_output.empty? ? "No description" : git_cat_output
+      if git_cat_output.empty?
+        return nil
+      end
 
       begin
         # İlk boş satırdan sonraki kısmı alıyoruz
-        yaml_part = description.lines.drop_while { |line| line.strip != "" }.join
+        yaml_part = git_cat_output.lines.drop_while { |line| line.strip != "" }.join
 
         # YAML'i Ruby nesnesine çeviriyoruz
         ruby_object = YAML.safe_load(yaml_part)

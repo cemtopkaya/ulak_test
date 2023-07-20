@@ -34,6 +34,7 @@
         <div class="wiki changeset-comments">
           <select id="select_tag_revision-<%= changeset.id %>">
             <% tag_info = UlakTest::Git.findTagsOfCommit(changeset.repository.url, changeset.identifier) %>
+            <option value="">Seçiniz</option>
             <%= options_for_select(tag_info.map { |tag| ["#{tag[:date]}", tag[:tag]] }) %>
           </select>
           <div class="div_artifact"></div>
@@ -63,30 +64,30 @@
     $('[id^="select_tag_revision-"]').select2({
         width:"350px",
         templateResult: templateTagOption
+    }).on('select2:select', function (e) {
+      console.log(">>>>> ",e.params.data);
+      if(!e.params.data){
+        return console.log(">>>>> Dolu bir seçenek seçilmedi!");
+      }
+      const $select = $(this)
+      const select_id = this.id
+      const changeset_id = $(this).attr("id").split('-')[1]
+      const selected_tag = e.params.data.id
+      const url = `/ulak_test/tab/code_artifacts/issues/<%=issue_id%>/changesets/${changeset_id}/tags?tag=${selected_tag}`
+      $.get( url, function( data ) {
+        console.log( "Load was performed. data: ", data );
+        console.log('>>> div_artifact.html boşaltılacak')
+        $(".div_artifact").each(function(idx, div){
+          console.log('>>> div_artifact.html boşaltılıyor')
+          $(div).html('')
+        })
+        $(`[id^="select_tag_revision-"]:not(#${select_id})`).each(function(idx, select){ 
+          console.log(select)
+          $(select).select2('val', " ")
+        })
+        
+        $select.parent().find(".div_artifact").html( data );
+      });
     });
   });
-
-
-  function open_jenkins_run(packageName, selectId){
-    const JENKINS_URL="<%= jenkins[:url] %>"
-    const JOB="<%= jenkins[:job] %>"
-    const JOB_TOKEN="<%= jenkins[:job_token] %>"
-    const [package, version] = packageName.split('_')
-    const DEBIAN_PACKAGE=`${package}=${version}`
-    const TARGET_SERVER=$('#'+selectId).val()
-
-    const JOB_URL = `${JENKINS_URL}/${JOB}/buildWithParameters?token=${JOB_TOKEN}&DEBIAN_PACKAGE=${DEBIAN_PACKAGE}&openStackName=${TARGET_SERVER}`
-
-    modal = window.open(JOB_URL, 'modal', 'width=500,height=500')
-  }
-
-  function updateButtonState(selectElement) {
-    var buttonElement = selectElement.nextElementSibling;
-
-    if (selectElement.value !== "") {
-      buttonElement.disabled = false;
-    } else {
-      buttonElement.disabled = true;
-    }
-  }
 </script>
