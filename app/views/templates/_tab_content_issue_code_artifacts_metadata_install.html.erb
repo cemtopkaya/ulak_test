@@ -3,7 +3,9 @@
     <div id="attributes" class="attributes">
       <div class="splitcontent">
         <% if @artifacts.empty? %>
-          <pre><%= "#{l(:text_git_tag_description_empty)}" %></pre>
+          <div class="splitcontentleft">
+            <pre><%= "#{l(:text_git_tag_description_empty)}" %></pre>
+          </div>
         <% else %>
         <!-- YAML olarak TAG Description -->
         <div class="splitcontentleft">
