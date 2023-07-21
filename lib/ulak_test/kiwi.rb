@@ -13,18 +13,20 @@ module UlakTest
       http
     end
 
-    def self.get_rest_info
+    def self.get_kiwi_info
       Setting.clear_cache
+      kiwi_url = Setting.plugin_ulak_test["kiwi_url"]
       rest_api_url = Setting.plugin_ulak_test["rest_api_url"]
       rest_api_username = Setting.plugin_ulak_test["rest_api_username"]
       rest_api_password = Setting.plugin_ulak_test["rest_api_password"]
 
-      if rest_api_url.blank? || rest_api_username.blank? || rest_api_password.blank?
+      if rest_api_url.blank? || rest_api_ username.blank? || rest_api_password.blank?
         Rails.logger.warn("--- Error: REST INFO can't be retrieved...")
         return nil
       end
 
       {
+        kiwi_url: kiwi_url,
         url: rest_api_url,
         username: rest_api_username,
         password: rest_api_password,
@@ -46,7 +48,7 @@ module UlakTest
     def self.login
       begin
         @headers.delete(:Cookie)
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Auth.login", {
           :username => rest.fetch(:username),
           :password => rest.fetch(:password),
@@ -76,7 +78,7 @@ module UlakTest
 
     def self.logout
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("TestCase.filter", [{ :category__product => "3" }])
 
         # HTTP isteği oluşturma
@@ -96,7 +98,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Product.filter", [{ "id": id }])
 
         # HTTP isteği oluşturma
@@ -119,7 +121,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Product.filter", [])
 
         # HTTP isteği oluşturma
@@ -148,7 +150,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Category.filter", [{ product: product_id }])
 
         # HTTP isteği oluşturma
@@ -172,7 +174,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("TestCase.filter", [{ :category__product => category_product }])
 
         # HTTP isteği oluşturma
@@ -205,8 +207,45 @@ module UlakTest
       login()
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
+        # HTTP isteği oluşturma
+        url = rest.fetch(:url)
+        http = create_http(url)
+
+        # POST isteği yapma
+        response = http.post(url, body.to_json, @headers)
+        result = JSON.parse(response.body)["result"]
+        result
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+      ensure
+        logout()
+      end
+
+      result
+    end
+
+    # ID değerleri verilen test durumlarının (test case) koşturulduğu
+    # ve sonuçlarında koşunun durumunu dönecek fonksiyon.
+
+    # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi
+    # @return [Array] Test sürdürmelerinin bir dizisi
+    def self.fetch_testexecution_by_run_id_in_case_id_in(run_ids, case_ids)
+      unless run_ids.is_a?(Array)
+        raise ArgumentError, "run_ids parameter must be an array"
+      end
+
+      unless case_ids.is_a?(Array)
+        raise ArgumentError, "case_ids parameter must be an array"
+      end
+
+      result = nil
+      login()
+
+      begin
+        rest = get_kiwi_info()
+        body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids, :run__id__in => run_ids  }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
         http = create_http(url)
@@ -242,7 +281,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Tag.filter", [{ :run__id__in => run_ids, :name => tag_name }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -274,7 +313,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("Tag.filter", [{ :name => tag_name }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -291,11 +330,13 @@ module UlakTest
 
       result
     end
+
+
     # Case ID değerleri için yapılan testler
 
     # @param [Array<Integer>] case_ids Test durumu kimlik numaralarının bir dizisi
     # @return [Array] Test sürdürmelerinin bir dizisi
-    def self.fetch_run_by_case_id_in(run_ids)
+    def self.fetch_runs_by_id_in(run_ids)
       unless run_ids.is_a?(Array)
         raise ArgumentError, "run_ids parameter must be an array"
       end
@@ -304,7 +345,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_rest_info()
+        rest = get_kiwi_info()
         body = make_request_body("TestRun.filter", [{ :id__in => run_ids }])
 
         # HTTP isteği oluşturma

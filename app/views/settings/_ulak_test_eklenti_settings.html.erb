@@ -29,7 +29,13 @@
 
   <tbody>
     <tr>
-      <th>URL</th>
+      <th>Kiwi URL</th>
+      <td>
+        <%= text_field_tag "settings_kiwi_url", @plugin.settings[:default]["kiwi_url"] %>
+      </td>
+    </tr>
+    <tr>
+      <th>API URL</th>
       <td>
         <%= text_field_tag "settings_rest_api_url", @plugin.settings[:default]["rest_api_url"] %>
       </td>

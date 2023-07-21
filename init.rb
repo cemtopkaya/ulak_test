@@ -41,6 +41,7 @@ Redmine::Plugin.register :ulak_test do
 
   Setting.clear_cache
   settings :default => {
+    "kiwi_url" => ayarlar["kiwi_url"],
     "rest_api_url" => ayarlar["rest_api_url"],
     "rest_api_username" => ayarlar["rest_api_username"],
     "rest_api_password" => ayarlar["rest_api_password"],

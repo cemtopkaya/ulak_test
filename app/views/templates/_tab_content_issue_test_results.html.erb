@@ -1,90 +1,95 @@
-<script>
-  console.log(">>> Test seçcmek için gerekli javascript metotları....");
-</script>
+<div id="kod_surumleri">
+  <% issue = Issue.find(issue_id) %>
+  <%= issue.changesets.empty? ? "<em>Henüz kod güncellemesi yapılmamış</em>" : "" %>
 
-<% if commit_with_artifacst.any? { |cs| cs[:artifacts].present? } 
-
-  # Test senaryolarının çalştırılma listesini dön
-  test_case_ids = tests.map { |t| t.test_case_id }
-  executions = UlakTest::Kiwi.fetch_testexecution_by_case_id_in(test_case_ids)
-  execution_summary = executions.map { |e| { run: e["run"], case: e["case"], case__summary: e["case__summary"], status__name: e["status__name"] } }
-
-  # Revizyonlardan üretilen artifacts oluşturulsun
-  all_artifacts = commit_with_artifacst.map { |cs| cs[:artifacts] }.compact.flatten
-  all_artifacts = all_artifacts.map { |artifact| { name: artifact, as_tag_name: nil, tags:nil, run_ids:[], runs:nil }}
-
-  all_artifacts.each do |artifact|
-    artifact[:as_tag_name] = artifact[:name]
-    if artifact[:name].end_with?(".deb") 
-      arr=artifact[:name].split("_")
-      artifact[:as_tag_name] = "#{arr[0]}=#{arr[1]}"
-    end
-    artifact[:tags] = UlakTest::Kiwi.fetch_tags_by_tag_name(artifact[:as_tag_name])
-    artifact[:run_ids] = artifact[:tags].map{ |t| t["run"]}
-    artifact[:runs] = UlakTest::Kiwi.fetch_tags_by_run_ids(artifact[:run_ids], artifact[:as_tag_name])
-    artifact[:executions] = execution_summary.select { |es| artifact[:run_ids].include?(es[:run]) }
-  end
-end %>
-
-
-<div class="box filedroplistner">
-  <div id="activity">
-      <% 
-          # issue_data = JSON.parse(@issue_data)
-          # issue_data["issue_tests"].each do |test| 
-          # tests.each do |test| 
-          commit_with_artifacst.each do |cwa| 
-            cs = cwa[:changeset]
-            artifacts_metadata = cwa[:artifacts_metadata=]
-            artifacts = cwa[:artifacts]
-      %>
-        <div class="commit_revision">
-          <h3>
-            <%= "#{l(:label_revision)} #{cs.format_identifier}"%>
-            [<%= authoring cs.committed_on, cs.author, label: :label_added_time_by %>]
-          </h3>
-          <p>
-            <% if artifacts.present? %>
-            <ol>
-              <% artifacts.each do |artifact| %>
-              <li>
-                <% a = all_artifacts.find { |a| a[:name] == artifact } %>
-                <%= a[:as_tag_name] %>
-                <% a[:executions].group_by { |item| item[:run] }.each do |execution| %>
-                <ol>
-                  <li>
-                    Run: <%= execution[0] %><br>
-                    Cases:
-                    <ol>
-                      <% execution[1].each do |e| %>
-                        <li>
-                          <% case e[:status__name]
-                            when "PASSED" 
-                              status_icon = "✓" 
-                            when "SKIPPED" 
-                              status_icon = "⚠️" 
-                            when "FAILED"
-                              status_icon = "❌" 
-                            else
-                              status_icon = ""
-                            end 
-                        %>
-
-                          <%= "#{status_icon} #{e[:status__name]} #{e[:case__summary]}" unless status_icon.empty? %>
-
-                        </li>
-                      <% end %>
-                    </ol>
-                  </li>
-                </ol>
-                <% end %>
-              </li>
-              <% end %>
-          
+  <%
+    issue.changesets.each do |changeset| 
+  %>
+    <div id="changeset-<%= changeset.id %>" class="changeset journal">
+      <div class="note">
+        <h4 class='note-header'>
+          <div class="contextual">
+            <abbr title="<%= changeset.repository.url %>">
+              <%= "#{l(:label_revision)} #{changeset.format_identifier}" %>
+            </abbr>
+            <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
+              (<%= link_to(l(:label_diff),
+                           controller: "repositories",
+                           action: "diff",
+                           id: changeset.project,
+                           repository_id: changeset.repository.identifier_param,
+                           path: "",
+                           rev: changeset.identifier) %>)
             <% end %>
-          </p>
-        </div> <!-- class="commit_revision" -->
+          </div>
 
-      <% end %>
-  </div>
+          <div>
+            <%= avatar(changeset.user, size: "24") %>
+            <%= authoring changeset.committed_on, changeset.author, label: :label_added_time_by %>
+          </div>
+        </h4>
+
+
+        <div class="wiki changeset-comments"><%= format_changeset_comments changeset %></div>
+        <div class="wiki changeset-comments">
+          <label for="select_tag_revision-<%= changeset.id %>" style="font-weight: bold;">Tags: </label>
+          <select id="select_tag_revision-<%= changeset.id %>">
+            <option value="">Seçiniz</option>
+            <% tag_info = UlakTest::Git.commit_tags(changeset.repository.url, changeset.identifier) %>
+            <%= options_for_select(tag_info.map { |tag| ["#{tag[:date]}", tag[:tag]] }) %>
+          </select>
+          <div class="div_artifact"></div>
+        </div>
+      </div>
+    </div>
+    <%= call_hook(:view_issues_history_changeset_bottom, { changeset: changeset }) %>
+    <hr style="margin-bottom:50px">
+  <% end %>
 </div>
+
+
+
+<script>
+  $(function(){
+    console.log(">>>> select2 için bıdı bıdı")
+    function templateTagOption(item){
+        if (!item.id) {
+          return item.text;
+        }
+        var $date = $('<b>' + item.id + '</b> ');
+        var $tag = $('<em style="float:right;display:block;">' + item.text + '</em>');
+        var $div = $('<div/>').append($date).append($tag);
+        return $div
+    }
+
+    $('[id^="select_tag_revision-"]').select2({
+        width:"350px",
+        templateResult: templateTagOption
+    }).on('select2:select', function (e) {
+      console.log(">>>>> ",e.params.data);
+      if(!e.params.data){
+        return console.log(">>>>> Dolu bir seçenek seçilmedi!");
+      }
+      const $select = $(this)
+      const select_id = this.id
+      const changeset_id = $(this).attr("id").split('-')[1]
+      const selected_tag = e.params.data.id
+      const url = `/ulak_test/issues/<%=issue_id%>/tab/test_results/changesets/${changeset_id}/tags?tag=${selected_tag}`
+      $.get( url, function( data ) {
+        console.log('>>> div_artifact.html boşaltılacak')
+        $(".div_artifact").each(function(idx, div){
+          console.log('>>> div_artifact.html boşaltılıyor')
+          $(div).html('')
+        })
+
+        $(`[id^="select_tag_revision-"]:not(#${select_id})`).each(function(idx, select){ 
+          console.log(select)
+          $(select).val("").trigger("change");
+        })
+
+        $div_artifact = $select.parent().find(".div_artifact")
+        $div_artifact.hide().html( data ).slideDown( "slow", function() {});
+      });
+    });
+  });
+</script>

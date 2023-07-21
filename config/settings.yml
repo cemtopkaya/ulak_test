@@ -1,3 +1,4 @@
+kiwi_url: "https://kiwi.ulakhaberlesme.com.tr/"
 rest_api_url: "https://kiwi.ulakhaberlesme.com.tr/json-rpc/"
 rest_api_username: "admin.test"
 rest_api_password: "Test123456789"

@@ -11,7 +11,9 @@
       <div class="note">
         <h4 class='note-header'>
           <div class="contextual">
-            <%= "#{l(:label_revision)} #{changeset.format_identifier}" %>
+            <abbr title="<%= changeset.repository.url %>">
+              <%= "#{l(:label_revision)} #{changeset.format_identifier}" %>
+            </abbr>
             <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
               (<%= link_to(l(:label_diff),
                            controller: "repositories",
@@ -35,7 +37,7 @@
           <label for="select_tag_revision-<%= changeset.id %>" style="font-weight: bold;">Tags: </label>
           <select id="select_tag_revision-<%= changeset.id %>">
             <option value="">Seçiniz</option>
-            <% tag_info = UlakTest::Git.findTagsOfCommit(changeset.repository.url, changeset.identifier) %>
+            <% tag_info = UlakTest::Git.commit_tags(changeset.repository.url, changeset.identifier) %>
             <%= options_for_select(tag_info.map { |tag| ["#{tag[:date]}", tag[:tag]] }) %>
           </select>
           <div class="div_artifact"></div>
@@ -74,7 +76,7 @@
       const select_id = this.id
       const changeset_id = $(this).attr("id").split('-')[1]
       const selected_tag = e.params.data.id
-      const url = `/ulak_test/tab/code_artifacts/issues/<%=issue_id%>/changesets/${changeset_id}/tags?tag=${selected_tag}`
+      const url = `/ulak_test/issues/<%=issue_id%>/tab/code_artifacts/changesets/${changeset_id}/tags?tag=${selected_tag}`
       $.get( url, function( data ) {
         console.log('>>> div_artifact.html boşaltılacak')
         $(".div_artifact").each(function(idx, div){

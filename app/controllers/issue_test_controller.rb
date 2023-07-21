@@ -76,32 +76,43 @@ class IssueTestController < ApplicationController
     render json: tests
   end
 
-  def create_run_test_cases(run_id, cwa, formatted_tests)
-    cem = formatted_tests.select { |test| test[:run].any? { |run| run[:id] == run_id } }
-    puts cem
-    # .map { |t| { :id => t[:id], :summary => t[:text], :status => t } }
-    # [
-    #   {
-    #     :id => 110,
-    #     :summary => "NG Setup Request",
-    #     :test_result => {
-    #       :status => "GEÇTİ",
-    #     },
-    #   },
-    # ]
-  end
-
-  def create_run_object(run_id, cwa, formatted_tests)
-    aykut = {
-      :id => run_id,
-      :artifacts => cwa[:artifact_full_names].select { |item| item[:run_ids].include?(run_id) }.map { |item| item[:artifact_full_name] },
-      :test_cases => create_run_test_cases(run_id, cwa, formatted_tests),
-    }
-    puts aykut
-  end
-
   # Test senaryolarının execute edilen koşuları bulur ve bu koşuların etiketlerinde geçen
   # paket_adı=versiyon değerini arar. Bulduklarını paketin olduğu test sonuçları olarak görüntüler.
+
+  def view_tag_runs
+    tag = params[:tag]
+    changeset_id = params[:changeset_id]
+    issue_id = params[:issue_id]
+
+    @issue = Issue.find(issue_id)
+    @cs = @issue.changesets.find_by_id(changeset_id)
+
+    @tests = Test
+      .joins(:issue_tests)
+      .where(issue_tests: { issue_id: issue_id })
+      .select(:test_case_id, :summary)  
+    @test_ids = @tests.pluck(:test_case_id)
+
+    @artifacts = UlakTest::Git.tag_artifacts(@cs.repository.url, tag)
+    @edited_artifacts = @artifacts.map { |a| a.end_with?(".deb") ? "#{a.split("_")[0]}=#{a.split("_")[1]}" : a }
+    # tag -> runs
+    @kiwi_tags = @edited_artifacts.map { |a| UlakTest::Kiwi.fetch_tags_by_tag_name(a) }.flatten
+    
+    @kiwi_run_ids = @kiwi_tags.pluck("run")
+    @kiwi_runs = UlakTest::Kiwi.fetch_runs_by_id_in(@kiwi_run_ids)
+    @kiwi_executions = UlakTest::Kiwi.fetch_testexecution_by_run_id_in_case_id_in(@kiwi_run_ids, @test_ids)
+    # executions -> run_id_in & case_id_in 
+
+    html_content = render_to_string(
+      template: "templates/_tab_test_results.html.erb",
+      # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
+      layout: false,
+      locals: {
+        issue_id: issue_id
+      },
+    )
+    render html: html_content
+  end
 
   def view_issue_test_results
     # 1. issue_id ile ilişkili test senaryolarını getir
@@ -117,6 +128,7 @@ class IssueTestController < ApplicationController
       .select(:test_case_id, :summary)
 
     issue = Issue.find(issue_id)
+    #commit_with_artifacst = UlakTest::Git.commit_tags(issue.changesets)
     commit_with_artifacst = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
     html_content = render_to_string(
