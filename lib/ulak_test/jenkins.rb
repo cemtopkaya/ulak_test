@@ -1,19 +1,25 @@
 module UlakTest
   module Jenkins
+    
+    @jenkins_settings = nil
+
     def self.get_jenkins_settings
-      Setting.clear_cache
-      jenkins_url = Setting.plugin_ulak_test["jenkins_url"]
-      jenkins_username = Setting.plugin_ulak_test["jenkins_username"]
-      jenkins_token = Setting.plugin_ulak_test["jenkins_token"]
-      deployment_job_path = Setting.plugin_ulak_test["deployment_job_path"] || "view/DevOps/job/DevOps/job/5GCN-Deployment"
-      deployment_job_token = Setting.plugin_ulak_test["deployment_job_token"] || "5gcn_deploy"
+      # Eğer sonuç ön bellekte varsa, direkt olarak onu döndür.
+      return @jenkins_settings if @jenkins_settings
+      
+      jenkins_url = Setting[$PLUGIN_NAME]["jenkins_url"]
+      jenkins_username = Setting[$PLUGIN_NAME]["jenkins_username"]
+      jenkins_token = Setting[$PLUGIN_NAME]["jenkins_token"]
+      deployment_job_path = Setting[$PLUGIN_NAME]["deployment_job_path"]
+      deployment_job_token = Setting[$PLUGIN_NAME]["deployment_job_token"]
 
       if jenkins_url.blank? || jenkins_username.blank? || jenkins_token.blank?
         Rails.logger.warn("--- Error: JENKINS INFO can't be retrieved...")
         return nil
       end
 
-      {
+      # Sonucu @jenkins_settings değişkeninde sakla ve döndür.
+      @jenkins_settings = {
         url: jenkins_url,
         username: jenkins_username,
         token: jenkins_token,

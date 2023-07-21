@@ -1,5 +1,16 @@
 module UlakTest
   module Kiwi
+
+# Test senaryolarının durumları
+# "BOŞTA"        : 1
+# "KOŞUYOR"      : 2 
+# "DURAKLATILDI" : 3
+# "GEÇTİ"        : 4
+# "BAŞARISIZ"    : 5
+# "BLOKE"        : 6
+# "HATALI"       : 7
+# "VAZGEÇİLDİ"   : 8
+
     @headers = {
       # "Cookie" => cookie, # Cookie bilgisi
       "Content-Type" => "application/json", # İstenilen gövde türü
@@ -13,19 +24,24 @@ module UlakTest
       http
     end
 
-    def self.get_kiwi_info
-      Setting.clear_cache
-      kiwi_url = Setting.plugin_ulak_test["kiwi_url"]
-      rest_api_url = Setting.plugin_ulak_test["rest_api_url"]
-      rest_api_username = Setting.plugin_ulak_test["rest_api_username"]
-      rest_api_password = Setting.plugin_ulak_test["rest_api_password"]
+    @kiwi_settings = nil
 
-      if rest_api_url.blank? || rest_api_ username.blank? || rest_api_password.blank?
+    def self.get_kiwi_info
+      
+      # Eğer sonuç ön bellekte varsa, direkt olarak onu döndür.
+      return @kiwi_settings if @kiwi_settings
+
+      kiwi_url = Setting[$PLUGIN_NAME]["kiwi_url"]
+      rest_api_url = Setting[$PLUGIN_NAME]["rest_api_url"]
+      rest_api_username = Setting[$PLUGIN_NAME]["rest_api_username"]
+      rest_api_password = Setting[$PLUGIN_NAME]["rest_api_password"]
+
+      if rest_api_url.blank? || rest_api_username.blank? || rest_api_password.blank?
         Rails.logger.warn("--- Error: REST INFO can't be retrieved...")
         return nil
       end
 
-      {
+      @kiwi_settings = {
         kiwi_url: kiwi_url,
         url: rest_api_url,
         username: rest_api_username,

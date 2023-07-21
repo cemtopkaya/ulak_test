@@ -2,6 +2,8 @@
 
 require "redmine"
 
+$PLUGIN_NAME = :plugin_kiwi_test
+
 def init
   begin
     Dir::foreach(File.join(File.dirname(__FILE__), "lib")) do |file|
@@ -27,32 +29,30 @@ else
   end
 end
 
-Redmine::Plugin.register :ulak_test do
+#Redmine::Plugin.remove_plugin('ulak_test')
+
+Redmine::Plugin.register :kiwi_test do
   name "Ulak Test"
-  author "Your Name"
-  description "A simple Redmine plugin that adds custom content to the issue details page."
+  author "Cem Topkaya"
+  description "Kiwi TCMS integration for Redmine"
   version "1.0.0"
-  url "https://example.com/plugin_homepage"
-  author_url "https://example.com/your_website"
-  requires_redmine :version_or_higher => "4.0.0"
+  url "https://github.com/cemtopkaya/ulak_test"
+  author_url "https://cemtopkaya.com"
+  requires_redmine :version_or_higher => "5.0.0"
 
   PLUGIN_ROOT = Pathname.new(__FILE__).join("..").realpath.to_s
-  ayarlar = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
+   yaml_settings = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
 
-  Setting.clear_cache
   settings :default => {
-    "kiwi_url" => ayarlar["kiwi_url"],
-    "rest_api_url" => ayarlar["rest_api_url"],
-    "rest_api_username" => ayarlar["rest_api_username"],
-    "rest_api_password" => ayarlar["rest_api_password"],
-    "jenkins_url" => ayarlar["jenkins_url"],
-    "jenkins_username" => ayarlar["jenkins_username"],
-    "jenkins_token" => ayarlar["jenkins_token"],
-    "deployment_job_path" => ayarlar["deployment_job_path"],
-    "deployment_job_token" => ayarlar["deployment_job_token"],
+    "kiwi_url" => yaml_settings["kiwi_url"],
+    "rest_api_url" => yaml_settings["rest_api_url"],
+    "rest_api_username" => yaml_settings["rest_api_username"],
+    "rest_api_password" => yaml_settings["rest_api_password"],
+    "jenkins_url" => yaml_settings["jenkins_url"],
+    "jenkins_username" => yaml_settings["jenkins_username"],
+    "jenkins_token" => yaml_settings["jenkins_token"],
+    "deployment_job_path" => yaml_settings["deployment_job_path"],
+    "deployment_job_token" => yaml_settings["deployment_job_token"],
   }, partial: "settings/ulak_test_eklenti_settings.html"
 
-  @settings = settings
-
-  puts settings
 end

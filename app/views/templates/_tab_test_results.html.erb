@@ -1,0 +1,79 @@
+<script>
+  console.log(">>> Test seçcmek için gerekli javascript metotları....");
+</script>
+
+<style>
+.ol_cases > li {
+
+}
+
+.ol_artifacts > li {
+    list-style: none;
+    margin: 10px 5px;
+}
+
+.ol_runs > li {
+    margin: 20px;
+    border: 1px solid;
+    padding: 5px;
+    list-style: none;
+}
+</style>
+
+<% 
+unless @edited_artifacts.empty? 
+kiwi_info = UlakTest::Kiwi.get_kiwi_info
+%>
+    <ol class="ol_artifacts">
+    <% @edited_artifacts.each do |package| %>
+        <li>
+            <b><%= package %></b> <br/>
+            <%
+            package_run_ids = @kiwi_tags.select { |t| t["name"].include?(package) }.map{ |t| t["run"] }
+            package_executions = @kiwi_executions.select { |e| package_run_ids.include?(e["run"]) }
+            unless package_executions.empty?
+            %>
+            <ol class="ol_runs">
+                <% #package_executions.each do |run| %>
+                <% package_run_ids.each do |run_id| %>
+                <li>
+                    RUN ID: <a href='<%= "#{kiwi_info[:kiwi_url]}/runs/#{run_id}" %>' _target="_blank"><%= run_id %></a><br>
+                    <ul>
+                        <% #@kiwi_executions.each  do |e| %>
+                        <% #@kiwi_executions.select { |e| [run["run"]].include?(e["run"]) }.each  do |e| %>
+                        <% @kiwi_executions.select { |e| e["run"] == run_id }.each  do |e| %>
+                        <li>
+                            <% case e["status"]
+                            when 4
+                                status_icon = "✓"
+                            when 8
+                                status_icon = "⚠️"
+                            when 1
+                                status_icon = "⏳"
+                            when 3
+                                status_icon = "⏸️"
+                            when 2 
+                                status_icon = "▶️"
+                            when 6
+                                status_icon = "🚫"
+                            when 7
+                                status_icon = "⚠️"
+                            when 5
+                                status_icon = "❌"
+                            else
+                                status_icon = ""
+                            end
+                            %>
+                            <abbr title='<%= e["status__name"] %>'> <%= status_icon %></abbr> 
+                            <a href='<%= "#{kiwi_info[:kiwi_url]}/case/#{e["case"]}" %>' _target="_blank"><%= e["case__summary"] %></a>
+                        </li>
+                        <% end %>
+                    </ul>
+                </li>
+                <% end %>
+            </ol>
+            <% end %>
+        </li>
+    <% end %>
+    </ol>
+<% end %>
