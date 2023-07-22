@@ -2,7 +2,8 @@
 
 require "redmine"
 
-$PLUGIN_NAME = :plugin_kiwi_test
+$NAME_KIWI_TESTS = :kiwi_test
+$PLUGIN_NAME_KIWI_TESTS = :plugin_kiwi_test
 
 def init
   begin
@@ -40,19 +41,14 @@ Redmine::Plugin.register :kiwi_test do
   author_url "https://cemtopkaya.com"
   requires_redmine :version_or_higher => "5.0.0"
 
-  PLUGIN_ROOT = Pathname.new(__FILE__).join("..").realpath.to_s
-   yaml_settings = YAML::load(File.open(File.join(PLUGIN_ROOT + "/config", "settings.yml")))
+  PLUGIN_ROOT_KIWI_TESTS = Pathname.new(__FILE__).join("..").realpath.to_s
+   yaml_settings = YAML::load(File.open(File.join(PLUGIN_ROOT_KIWI_TESTS + "/config", "settings.yml")))
 
   settings :default => {
     "kiwi_url" => yaml_settings["kiwi_url"],
     "rest_api_url" => yaml_settings["rest_api_url"],
     "rest_api_username" => yaml_settings["rest_api_username"],
     "rest_api_password" => yaml_settings["rest_api_password"],
-    "jenkins_url" => yaml_settings["jenkins_url"],
-    "jenkins_username" => yaml_settings["jenkins_username"],
-    "jenkins_token" => yaml_settings["jenkins_token"],
-    "deployment_job_path" => yaml_settings["deployment_job_path"],
-    "deployment_job_token" => yaml_settings["deployment_job_token"],
   }, partial: "settings/ulak_test_eklenti_settings.html"
 
 end

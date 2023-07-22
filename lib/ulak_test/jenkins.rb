@@ -7,11 +7,11 @@ module UlakTest
       # Eğer sonuç ön bellekte varsa, direkt olarak onu döndür.
       return @jenkins_settings if @jenkins_settings
       
-      jenkins_url = Setting[$PLUGIN_NAME]["jenkins_url"]
-      jenkins_username = Setting[$PLUGIN_NAME]["jenkins_username"]
-      jenkins_token = Setting[$PLUGIN_NAME]["jenkins_token"]
-      deployment_job_path = Setting[$PLUGIN_NAME]["deployment_job_path"]
-      deployment_job_token = Setting[$PLUGIN_NAME]["deployment_job_token"]
+      jenkins_url = Setting[$PLUGIN_NAME_KIWI_TESTS]["jenkins_url"]
+      jenkins_username = Setting[$PLUGIN_NAME_KIWI_TESTS]["jenkins_username"]
+      jenkins_token = Setting[$PLUGIN_NAME_KIWI_TESTS]["jenkins_token"]
+      deployment_job_path = Setting[$PLUGIN_NAME_KIWI_TESTS]["deployment_job_path"]
+      deployment_job_token = Setting[$PLUGIN_NAME_KIWI_TESTS]["deployment_job_token"]
 
       if jenkins_url.blank? || jenkins_username.blank? || jenkins_token.blank?
         Rails.logger.warn("--- Error: JENKINS INFO can't be retrieved...")

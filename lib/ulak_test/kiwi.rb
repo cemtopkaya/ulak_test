@@ -31,10 +31,10 @@ module UlakTest
       # Eğer sonuç ön bellekte varsa, direkt olarak onu döndür.
       return @kiwi_settings if @kiwi_settings
 
-      kiwi_url = Setting[$PLUGIN_NAME]["kiwi_url"]
-      rest_api_url = Setting[$PLUGIN_NAME]["rest_api_url"]
-      rest_api_username = Setting[$PLUGIN_NAME]["rest_api_username"]
-      rest_api_password = Setting[$PLUGIN_NAME]["rest_api_password"]
+      kiwi_url = Setting[$PLUGIN_NAME_KIWI_TESTS]["kiwi_url"]
+      rest_api_url = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_url"]
+      rest_api_username = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_username"]
+      rest_api_password = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_password"]
 
       if rest_api_url.blank? || rest_api_username.blank? || rest_api_password.blank?
         Rails.logger.warn("--- Error: REST INFO can't be retrieved...")

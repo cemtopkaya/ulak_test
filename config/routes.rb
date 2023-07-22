@@ -13,13 +13,7 @@ Rails.application.routes.draw do
     get "ulak_test/issues/:issue_id/tests/", to: "issue_test#get_issue_tests"
     post "ulak_test/issues/:issue_id/tests/:test_id", to: "issue_test#add_test_to_issue"
     delete "ulak_test/issues/:issue_id/tests/:test_id", to: "issue_test#remove_test_from_issue"
-  
-    # Issue Code Artifacts rotası
-    get "/ulak_test/issues/:issue_id/tab/code_artifacts", to: "issue_code_artifacts#view_issue_code_artifacts"
-    # get "/ulak_test/tab/code_artifacts/issues/:issue_id/changesets/:changeset_id/tags/:tag", to: "issue_code_artifacts#get_tag_artifact_metadata"
-    get "/ulak_test/issues/:issue_id/tab/code_artifacts/changesets/:changeset_id/tags", to: "issue_code_artifacts#get_tag_artifact_metadata"
-
-    
+      
     # Jenkins Scriptler API rotası
     get "ulak_test/environments", to: "jenkins_scriptler_api#get_environments"
   
