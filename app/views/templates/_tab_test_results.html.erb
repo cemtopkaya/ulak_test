@@ -20,9 +20,15 @@ ol.runs > li {
 }
 </style>
 
-<% 
-unless @edited_artifacts.empty? 
-kiwi_info = UlakTest::Kiwi.get_kiwi_info
+<%
+ if @edited_artifacts.empty? %>
+ <p>
+    <em>Kod değişimi için üretilen "Git Etiketinde" bir artifact açıklaması bulunamadı!</em><br/>
+    <pre><%= @tag_description %></pre>
+ </p>
+<%
+ else
+    kiwi_info = UlakTest::PluginSetting.get_kiwi_settings
 %>
     <ol class="tests">
     <% @edited_artifacts.each do |package| %>
@@ -34,13 +40,10 @@ kiwi_info = UlakTest::Kiwi.get_kiwi_info
             unless package_executions.empty?
             %>
             <ol class="runs">
-                <% #package_executions.each do |run| %>
                 <% package_run_ids.each do |run_id| %>
                 <li>
                     RUN ID: <a href='<%= "#{kiwi_info[:kiwi_url]}/runs/#{run_id}" %>' _target="_blank"><%= run_id %></a><br>
                     <ul>
-                        <% #@kiwi_executions.each  do |e| %>
-                        <% #@kiwi_executions.select { |e| [run["run"]].include?(e["run"]) }.each  do |e| %>
                         <% @kiwi_executions.select { |e| e["run"] == run_id }.each  do |e| %>
                         <li>
                             <% case e["status"]

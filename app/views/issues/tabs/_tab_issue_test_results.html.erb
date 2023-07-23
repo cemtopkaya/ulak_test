@@ -8,7 +8,7 @@ $(document).ready(function () {
   let tabHeaderId = 'tab-test_results'
   let tabContentId = 'tab-content-test_results'
   let url = `/issues/${issueId}?tab=${tabName}`;
-  let remote_url = `/ulak_test/issues/${issueId}/tab/${tabName}`;
+  let remote_url = `/<%= $NAME_KIWI_TESTS %>/issues/${issueId}/tab/${tabName}`;
 
   function createTabHeader($history_ul) {
     // Tab'ın başlığını oluşturup sekmelerin yanına yerleştirelim

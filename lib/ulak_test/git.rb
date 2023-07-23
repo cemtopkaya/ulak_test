@@ -24,12 +24,17 @@ module UlakTest
       tag_info
     end
 
-    def self.tag_artifacts_metadata(repository_url, tag)
-      result = nil
-      
+    def self.tag_description(repository_url, tag)
       git_cat_command = "git -C #{repository_url} cat-file -p #{tag}"
       puts ">>>> git_cat_command: #{git_cat_command}"
       git_cat_output = `#{git_cat_command}`
+      git_cat_output
+    end
+
+    def self.tag_artifacts_metadata(repository_url, tag)
+      result = nil
+      
+      git_cat_output = tag_description(repository_url, tag)
 
       if git_cat_output.empty?
         return nil

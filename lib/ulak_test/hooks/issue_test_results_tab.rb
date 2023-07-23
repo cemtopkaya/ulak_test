@@ -23,15 +23,15 @@ module UlakTest
           output = controller.send(:render_to_string, {
             partial: "issues/tabs/tab_issue_test_results",
             locals: {
-                      tab_issue_assoc_revisions: {
-                        issue_data: issue_data.to_json,
-                      },
-                      tab_test_results: {
-                        issue_id: issue.id,
-                        issue: issue,
-                        tests: tests.to_json,
-                      },
-                    },
+              tab_issue_assoc_revisions: {
+                issue_data: issue_data.to_json,
+              },
+              tab_test_results: {
+                issue_id: issue.id,
+                issue: issue,
+                tests: tests.to_json,
+              },
+            },
           })
 
           output

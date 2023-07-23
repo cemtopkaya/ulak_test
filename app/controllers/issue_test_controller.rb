@@ -87,31 +87,51 @@ class IssueTestController < ApplicationController
     @issue = Issue.find(issue_id)
     @cs = @issue.changesets.find_by_id(changeset_id)
 
-    @tests = Test
-      .joins(:issue_tests)
-      .where(issue_tests: { issue_id: issue_id })
-      .select(:test_case_id, :summary)  
-    @test_ids = @tests.pluck(:test_case_id)
+    begin
+      @tests = Test
+        .joins(:issue_tests)
+        .where(issue_tests: { issue_id: issue_id })
+        .select(:test_case_id, :summary)  
+      @test_ids = @tests.pluck(:test_case_id)
 
-    @artifacts = UlakTest::Git.tag_artifacts(@cs.repository.url, tag)
-    @edited_artifacts = @artifacts.map { |a| a.end_with?(".deb") ? "#{a.split("_")[0]}=#{a.split("_")[1]}" : a }
-    # tag -> runs
-    @kiwi_tags = @edited_artifacts.map { |a| UlakTest::Kiwi.fetch_tags_by_tag_name(a) }.flatten
-    
-    @kiwi_run_ids = @kiwi_tags.pluck("run")
-    @kiwi_runs = UlakTest::Kiwi.fetch_runs_by_id_in(@kiwi_run_ids)
-    @kiwi_executions = UlakTest::Kiwi.fetch_testexecution_by_run_id_in_case_id_in(@kiwi_run_ids, @test_ids)
-    # executions -> run_id_in & case_id_in 
+      @artifacts = UlakTest::Git.tag_artifacts(@cs.repository.url, tag)
+      if @artifacts.empty? 
+        @tag_description = UlakTest::Git.tag_description(@cs.repository.url, tag)
+      end
+      @edited_artifacts = @artifacts.map { |a| a.end_with?(".deb") ? "#{a.split("_")[0]}=#{a.split("_")[1]}" : a }
+      result = UlakTest::Kiwi.is_kiwi_accessable()
+      
+      if !result[:is_accessable]
+        render json: result
+        return
+      end
 
-    html_content = render_to_string(
-      template: "templates/_tab_test_results.html.erb",
-      # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
-      layout: false,
-      locals: {
-        issue_id: issue_id
-      },
-    )
-    render html: html_content
+      # tag -> runs
+      @kiwi_tags = @edited_artifacts.map { |a| UlakTest::Kiwi.fetch_tags_by_tag_name(a) }.flatten
+      
+      @kiwi_run_ids = @kiwi_tags.pluck("run")
+      @kiwi_runs = UlakTest::Kiwi.fetch_runs_by_id_in(@kiwi_run_ids)
+      @kiwi_executions = UlakTest::Kiwi.fetch_testexecution_by_run_id_in_case_id_in(@kiwi_run_ids, @test_ids)
+      # executions -> run_id_in & case_id_in 
+
+      html_content = render_to_string(
+        template: "templates/_tab_test_results.html.erb",
+        # layout: false ile tüm Redmine sayfasının derlenMEmesini sağlarız
+        layout: false,
+        locals: {
+          issue_id: issue_id
+        },
+      )
+      render html: html_content  
+    rescue SocketError => e
+      @error_message = "#{l(:text_exception_name)}: #{e.message}"
+      render 'errors/socket_error', layout: false
+    rescue StandardError => e
+      puts "----- Error occurred: #{e.message}"
+      @error_message = "#{l(:text_exception_name)}: #{e.message}"
+      render 'errors/error', layout: false
+    end
+  
   end
 
   def view_issue_test_results

@@ -2,8 +2,8 @@
 
 require "redmine"
 
-$NAME_KIWI_TESTS = :kiwi_test
-$PLUGIN_NAME_KIWI_TESTS = :plugin_kiwi_test
+$NAME_KIWI_TESTS = :kiwi_test_2
+$PLUGIN_NAME_KIWI_TESTS = :plugin_kiwi_test_2
 
 def init
   begin
@@ -30,13 +30,11 @@ else
   end
 end
 
-#Redmine::Plugin.remove_plugin('ulak_test')
-
-Redmine::Plugin.register :kiwi_test do
+Redmine::Plugin.register $NAME_KIWI_TESTS do
   name "Ulak Test"
   author "Cem Topkaya"
   description "Kiwi TCMS integration for Redmine"
-  version "1.0.0"
+  version "1.0.1"
   url "https://github.com/cemtopkaya/ulak_test"
   author_url "https://cemtopkaya.com"
   requires_redmine :version_or_higher => "5.0.0"
@@ -50,5 +48,6 @@ Redmine::Plugin.register :kiwi_test do
     "rest_api_username" => yaml_settings["rest_api_username"],
     "rest_api_password" => yaml_settings["rest_api_password"],
   }, partial: "settings/ulak_test_eklenti_settings.html"
-
 end
+
+

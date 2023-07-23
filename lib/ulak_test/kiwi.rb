@@ -24,30 +24,23 @@ module UlakTest
       http
     end
 
-    @kiwi_settings = nil
-
-    def self.get_kiwi_info
-      
-      # Eğer sonuç ön bellekte varsa, direkt olarak onu döndür.
-      return @kiwi_settings if @kiwi_settings
-
-      kiwi_url = Setting[$PLUGIN_NAME_KIWI_TESTS]["kiwi_url"]
-      rest_api_url = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_url"]
-      rest_api_username = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_username"]
-      rest_api_password = Setting[$PLUGIN_NAME_KIWI_TESTS]["rest_api_password"]
-
-      if rest_api_url.blank? || rest_api_username.blank? || rest_api_password.blank?
-        Rails.logger.warn("--- Error: REST INFO can't be retrieved...")
-        return nil
+    def self.is_kiwi_accessable
+      begin
+        login()
+        return {
+          is_accessable: true,
+          message: "Kiwi server is accessable"
+        }
+      rescue StandardError => e
+        puts "----- Error occurred: #{e.message}"
+        raise e
+        return {
+          is_accessable: false,
+          message: "Kiwi server is not accessable! Error:  #{e.message}"
+        }
       end
-
-      @kiwi_settings = {
-        kiwi_url: kiwi_url,
-        url: rest_api_url,
-        username: rest_api_username,
-        password: rest_api_password,
-      }
     end
+
 
     def self.make_request_body(method = nil, params = {})
       body = {
@@ -64,7 +57,7 @@ module UlakTest
     def self.login
       begin
         @headers.delete(:Cookie)
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Auth.login", {
           :username => rest.fetch(:username),
           :password => rest.fetch(:password),
@@ -87,6 +80,7 @@ module UlakTest
         end
       rescue StandardError => e
         puts "----- Error occurred: #{e.message}"
+        raise e
       end
       @headers[:Cookie] = "sessionid=#{JSON.parse(response.body)["result"]}"
       JSON.parse(response.body)["result"]
@@ -94,7 +88,7 @@ module UlakTest
 
     def self.logout
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("TestCase.filter", [{ :category__product => "3" }])
 
         # HTTP isteği oluşturma
@@ -114,7 +108,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Product.filter", [{ "id": id }])
 
         # HTTP isteği oluşturma
@@ -137,7 +131,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Product.filter", [])
 
         # HTTP isteği oluşturma
@@ -166,7 +160,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Category.filter", [{ product: product_id }])
 
         # HTTP isteği oluşturma
@@ -190,7 +184,7 @@ module UlakTest
       result = nil
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("TestCase.filter", [{ :category__product => category_product }])
 
         # HTTP isteği oluşturma
@@ -223,7 +217,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -260,7 +254,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("TestExecution.filter", [{ :case__id__in => case_ids, :run__id__in => run_ids  }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -297,7 +291,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Tag.filter", [{ :run__id__in => run_ids, :name => tag_name }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -329,7 +323,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("Tag.filter", [{ :name => tag_name }])
         # HTTP isteği oluşturma
         url = rest.fetch(:url)
@@ -361,7 +355,7 @@ module UlakTest
       login()
 
       begin
-        rest = get_kiwi_info()
+        rest = UlakTest::PluginSetting.get_kiwi_settings()
         body = make_request_body("TestRun.filter", [{ :id__in => run_ids }])
 
         # HTTP isteği oluşturma

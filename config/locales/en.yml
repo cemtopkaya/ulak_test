@@ -7,3 +7,6 @@ en:
   text_issue_code_artifacs: Code Artifacts
   text_issue_test_results: Test Results
   text_git_tag_description_empty: Git tag doesn't have any description points artifacts.
+  text_exception_name: Exception
+  text_socket_error_occured: Connection Exception Occured
+  text_exception_occured: Exception Occured
