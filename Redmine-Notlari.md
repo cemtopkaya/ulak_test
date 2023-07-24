@@ -288,3 +288,67 @@ call_hook(:view_wiki_show_sidebar_bottom, :wiki => @wiki, :page => @page)
 call_hook(hook, context={})
 call_hook(hook, default_context.merge(context)
 ```
+
+# Eklentilerin Proje Modüllerinde Faal Edilmesi
+
+### Proje modüllerini listele:
+
+```ruby
+Project.find(1).enabled_module_names
+["issue_tracking", "time_tracking", "news", "documents", "files", "wiki", "repository", "boards", "calendar", "gantt", "git_tag_artifacts_1_0_0"]
+```
+
+```ruby
+# eklentinin adı sembol olarak $NAME_CODE_ARTIFACTS global değişkeninde tutuluyor
+# $NAME_CODE_ARTIFACTS = :git_tag_artifacts_1_0_0
+project_id = context[:project][:id]
+current_project = Project.find(project_id)
+current_project.module_enabled?($NAME_CODE_ARTIFACTS)
+```
+
+# Eklenti Yetkilendirme
+
+`init.rb` Dosyasında yetkilendirme ayarlarını eklentiyi modül haline getirip oluşturuyoruz:
+
+```ruby
+  project_module $NAME_CODE_ARTIFACTS do
+    # Code Artifacts sekme başlığını
+    permission :view_issue_code_artifacts_tab, {}
+    # Code Artifacts sekme içeriğini göster
+    permission :view_issue_code_artifacts, { issue_code_artifacts: :view_issue_code_artifacts }
+    # Code Artifacts etiketlerinin bilgilerini çek
+    permission :get_tag_artifact_metadata, { issue_code_artifacts: :get_tag_artifact_metadata }
+  end
+```
+
+`before_action :authorize, only: [ :get_tag_artifact_metadata, :view_issue_code_artifacts ]` bu kod şu demek:
+Sadece (`only`) `get_tag_artifact_metadata` ve `view_issue_code_artifacts` metotlarını çalıştırmadan önce (`before_action`) Redmine ile gelen `authorize` metodunu çalıştırıp yetkilendirme yapar. Bu yetkilendirme `benim_yetkilendirmem` fonksiyonuna benzer bir iş yapar.
+Bu işi kendimiz yapmak istersek `before_action :benim_yetkilendirmem, only: [ :get_tag_artifact_metadata, :view_issue_code_artifacts ]` kodunu inceleyebilirsiniz.
+
+```ruby
+class IssueCodeArtifactsController < ApplicationController
+  # before_action :authorize, only: [ :get_tag_artifact_metadata, :view_issue_code_artifacts ]
+  before_action :benim_yetkilendirmem, only: [ :get_tag_artifact_metadata, :view_issue_code_artifacts ]
+
+  def benim_yetkilendirmem
+    current_project = Project.find(Issue.find(params[:issue_id])[:project_id])
+    unless User.current.allowed_to?(:get_tag_artifact_metadata, current_project)
+      @error_message = "Kullanıcının bu bilgiye erişme yetkisi yok!"
+      html_content = render_to_string(
+        template: "errors/401",
+        layout: false,
+      )
+      render html: html_content
+    end
+  end
+
+  def get_tag_artifact_metadata
+    puts ">>>>>>>>>> get_tag_artifact_metadata.............."
+  end
+end
+```
+
+```ruby
+Redmine::AccessControl.permission(:view_code_artifacts)
+#<Redmine::AccessControl::Permission:0x00007fb15ba99548 @name=:view_code_artifacts, @actions=["issue_code_artifacts/get_tag_artifact_metadata"], @public=false, @require=nil, @read=false, @project_module=:git_tag_artifacts_1_0_0>
+```

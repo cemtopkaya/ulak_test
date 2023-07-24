@@ -1,5 +1,5 @@
 <div id="kod_surumleri">
-  <% issue = Issue.find(issue_id) %>
+
   <%= issue.changesets.empty? ? "<em>Henüz kod güncellemesi yapılmamış</em>" : "" %>
 
   <%
@@ -35,7 +35,13 @@
           <label for="select_tag_revision-<%= changeset.id %>" style="font-weight: bold;">Tags: </label>
           <select id="select_tag_revision-<%= changeset.id %>">
             <option value="">Seçiniz</option>
-            <% tag_info = UlakTest::Git.commit_tags(changeset.repository.url, changeset.identifier) %>
+            <% 
+            begin
+              tag_info = UlakTest::Git.commit_tags(changeset.repository.url, changeset.identifier) 
+            rescue StandartError => e 
+            %>
+              alert('İstisna alındı: ' + <%= e.message %>)
+            <% end %>
             <%= options_for_select(tag_info.map { |tag| ["#{tag[:date]}", tag[:tag]] }) %>
           </select>
           <div class="tests"></div>

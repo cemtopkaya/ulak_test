@@ -2,9 +2,6 @@
 
 require "redmine"
 
-$NAME_KIWI_TESTS = :kiwi_test_2
-$PLUGIN_NAME_KIWI_TESTS = :plugin_kiwi_test_2
-
 def init
   begin
     Dir::foreach(File.join(File.dirname(__FILE__), "lib")) do |file|
@@ -30,6 +27,9 @@ else
   end
 end
 
+$NAME_KIWI_TESTS = :ulak_kiwi_test_v1
+$PLUGIN_NAME_KIWI_TESTS = :plugin_ulak_kiwi_test_v1
+
 Redmine::Plugin.register $NAME_KIWI_TESTS do
   name "Ulak Test"
   author "Cem Topkaya"
@@ -48,6 +48,18 @@ Redmine::Plugin.register $NAME_KIWI_TESTS do
     "rest_api_username" => yaml_settings["rest_api_username"],
     "rest_api_password" => yaml_settings["rest_api_password"],
   }, partial: "settings/ulak_test_eklenti_settings.html"
+
+  
+  project_module $NAME_KIWI_TESTS do
+    # "Test Results" sekme başlığını
+    permission :view_tab_issue_test_results_tab, {}
+    
+    permission :view_issue_test_results, issue_test: :view_issue_test_results, :public => true
+    permission :view_tag_runs, issue_test: :view_tag_runs, :public => true
+    permission :get_issue_tests, issue_test: :get_issue_tests, :public => true
+    
+    permission :edit_issue_tests, {:issue_test => [:add_test_to_issue, :remove_test_from_issue]}, :require => :member
+  end
 end
 
 

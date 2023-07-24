@@ -45,6 +45,13 @@ class IssueTestController < ApplicationController
     issue = Issue.find(issue_id)
     return render json: { error: "Issue not found" }, status: :not_found unless issue
 
+    # Check if the user is authorized to view the plugin.
+    unless User.current.allowed_to?(:get_issue_tests, issue.project)
+      # The user is not authorized to view the plugin.
+      Rails.logger.info(">>> #{User.current.login} does not have permission to get issue's tests will not be fetched... !!!! <<<<")
+      return
+    end
+
     tests = issue.tests.select(:id, :summary)
 
     # "tests" dizisini istenen formata dönüştürmek için map kullanıyoruz
@@ -80,11 +87,32 @@ class IssueTestController < ApplicationController
   # paket_adı=versiyon değerini arar. Bulduklarını paketin olduğu test sonuçları olarak görüntüler.
 
   def view_tag_runs
+    
     tag = params[:tag]
     changeset_id = params[:changeset_id]
     issue_id = params[:issue_id]
 
     @issue = Issue.find(issue_id)
+
+    # Check if the user is authorized to view the plugin.
+    unless User.current.allowed_to?(:view_tag_runs, @issue.project)
+      # The user is not authorized to view the plugin.
+      Rails.logger.info(">>> #{User.current.login} does not have permission to view the Issue Edit for Kiwi Tests field, so this tab will not be created... !!!! <<<<")
+      @error_message = "Kullanıcının bu bilgiye erişme yetkisi yok!"
+      html_content = render_to_string(
+        template: "errors/401",
+        layout: false,
+      )
+      return render html: html_content
+    end
+        
+    # Check if the user is authorized to view the plugin.
+    unless User.current.allowed_to?(:view_tag_runs, @issue.project)
+      # The user is not authorized to view the plugin.
+      Rails.logger.info(">>> #{User.current.login} does not have permission to view the Tags of Runs will not be fetched... !!!! <<<<")
+      return
+    end
+
     @cs = @issue.changesets.find_by_id(changeset_id)
 
     begin
@@ -135,19 +163,26 @@ class IssueTestController < ApplicationController
   end
 
   def view_issue_test_results
-    # 1. issue_id ile ilişkili test senaryolarını getir
-    # 2. test senaryolarının çalıştırıldığı koşuları bul
-    # 3. koşuların etiketlerinde paketi ara (paketin olduğu koşuları süz)
-    # 4. "paket olduğu koşuların içindeki" senaryoların durumlarına göre sayfayı render et
-
-    # 1
     issue_id = params[:issue_id]
+    issue = Issue.find(issue_id)
+    
+    # Check if the user is authorized to view the plugin.
+    unless User.current.allowed_to?(:view_issue_test_results, issue.project)
+      # The user is not authorized to view the plugin.
+      Rails.logger.info(">>> #{User.current.login} does not have permission to view the Issue Edit for Kiwi Tests field, so this tab will not be created... !!!! <<<<")
+      @error_message = "Kullanıcının bu bilgiye erişme yetkisi yok!"
+      html_content = render_to_string(
+        template: "errors/401",
+        layout: false,
+      )
+      return render html: html_content
+    end
+
     tests = Test
       .joins(:issue_tests)
       .where(issue_tests: { issue_id: issue_id })
       .select(:test_case_id, :summary)
 
-    issue = Issue.find(issue_id)
     #commit_with_artifacst = UlakTest::Git.commit_tags(issue.changesets)
     commit_with_artifacst = UlakTest::Git.findTagsOfCommits(issue.changesets)
 
@@ -157,6 +192,7 @@ class IssueTestController < ApplicationController
       layout: false,
       locals: {
         commit_with_artifacst: commit_with_artifacst,
+        issue: issue,
         issue_id: issue_id,
         tests: tests,
       },

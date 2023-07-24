@@ -4,7 +4,15 @@ include ActionView::Helpers::SanitizeHelper
 module UlakTest
   module Hooks
     class IssueTestsField < Redmine::Hook::ViewListener
-      def self.upsert_issue_test(issue_id, new_test_ids)
+      def self.upsert_issue_test(issue_id, project, new_test_ids)
+        
+        # Check if the user is authorized to view the plugin.
+        unless User.current.allowed_to?(:edit_issue_tests, project)
+          # The user is not authorized to view the plugin.
+          Rails.logger.info(">>> #{User.current.login} does not have permission to view the Issue Edit for Kiwi Tests field, so this tab will not be created... !!!! <<<<")
+          return
+        end
+
         old_test_ids = Test
           .joins(:issue_tests)
           .where(issue_tests: { issue_id: issue_id })
@@ -34,6 +42,14 @@ module UlakTest
       end
 
       def view_issues_form_details_bottom(context = {})
+        
+        # Check if the user is authorized to view the plugin.
+        unless User.current.allowed_to?(:edit_issue_tests, context[:issue].project)
+          # The user is not authorized to view the plugin.
+          Rails.logger.info(">>> #{User.current.login} does not have permission to view the Issue Edit for Kiwi Tests field, so this tab will not be created... !!!! <<<<")
+          return
+        end
+
         if context[:issue].new_record?
           select_options = []
         else
@@ -90,7 +106,8 @@ module UlakTest
         # new_tests = context[:params][:test_select_input].map(&:to_i)
         new_tests = context.dig(:params, :test_select_input)&.map(&:to_i) || []
         issue_id = context[:issue].id
-        IssueTestsField.upsert_issue_test(issue_id, new_tests)
+        project = context[:issue].project
+        IssueTestsField.upsert_issue_test(issue_id, project, new_tests)
       end
 
       private
