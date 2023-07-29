@@ -10,3 +10,7 @@ en:
   text_exception_name: Exception
   text_socket_error_occured: Connection Exception Occured
   text_exception_occured: Exception Occured
+  no_associated_code_revision: No code update yet
+  no_associated_tests: No tests related with issue
+  text_sync_kiwi_tests: Synchronise
+  button_sync_kiwi_tests: Sync Kiwi Test Cases

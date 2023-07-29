@@ -308,6 +308,24 @@ current_project.module_enabled?($NAME_CODE_ARTIFACTS)
 
 # Eklenti Yetkilendirme
 
+### Kaynaklar
+
+- [Diving into the initialization file](https://subscription.packtpub.com/book/business-and-other/9781783288748/1/ch01lvl1sec09/diving-into-the-initialization-file)
+
+
+### Modül Temelli Yetkilendirme
+Her Redmine eklentisi, eklentinin başlangıçta Redmine'e kaydedilmesi için bir başlatma dosyası (init.rb) eklenmesini gerektirir.
+
+Aşağıda bir init.rb dosyasında eklentiye dair yer alabilecek özelliklerin açıklamalarını bulabilirsiniz:
+
+**`name`:** Bu, eklentinin tam adıdır. 
+**`description`:** Bu, eklentinin ne yaptığına dair kısa bir açıklama verir. 
+**`url`:** Bu, eklentinin kendisinin web sitesidir. Bu genellikle çevrimiçi veri havuzu URL'si (GitHub, Bitbucket, Google Code vb.) veya eklenti web sitesidir (varsa veya uygulanabilirse). 
+**`author`:** Bu, eklentinin yazarlarının adlarını tutar. 
+**`author_url`:** Bu, genellikle yazar(lar)ın e-posta adreslerine veya bloglarına bağlantıdır. 
+**`version`:** Bu, eklentinin dahili sürüm numarasıdır. Zorunlu olmamakla birlikte, Redmine benzer (resmi olmasa da) bir numaralandırma şeması izlediğinden Anlamsal Sürüm Oluşturma kullanmak iyi bir uygulamadır (daha fazla bilgi için http://semver.org adresine bakın). 
+**`settings`:** Bu alan, dahili eklenti ayarlarının varsayılan değerlerini tanımlamak ve ayarlamak ve sistem yöneticilerinin eklenti yapılandırma değerlerini ayarlamak için kullanabileceği kısmi bir görünüme bağlantı vermek için kullanılır.
+
 `init.rb` Dosyasında yetkilendirme ayarlarını eklentiyi modül haline getirip oluşturuyoruz:
 
 ```ruby

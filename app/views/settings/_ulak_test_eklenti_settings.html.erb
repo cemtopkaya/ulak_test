@@ -41,19 +41,19 @@
       </td>
     </tr>
     <tr>
-      <th>Username</th>
+      <th><%= l(:field_login) %></th>
       <td>
         <%= text_field_tag "settings_rest_api_username", @plugin.settings[:default]["rest_api_username"] %>
       </td>
     </tr>
     <tr>
-      <th>Password</th>
+      <th><%= l(:field_password) %></th>
       <td>
         <%= password_field_tag "settings_rest_api_password", @plugin.settings[:default]["rest_api_password"] %>
       </td>
     </tr>
     <tr>
-      <th>Sync Kiwi Tests</th>
+      <th><%= l(:text_sync_kiwi_tests) %></th>
       <td>
         <script>
           function syncKiwiTests() {
@@ -64,7 +64,7 @@
             });
           }
         </script>
-        <%= button_tag "Sync Kiwi Tests", type: "button", name: "btn_sync_kiwi_tests", onclick: "syncKiwiTests()" %>
+        <%= button_tag l(:button_sync_kiwi_tests), type: "button", name: "btn_sync_kiwi_tests", onclick: "syncKiwiTests()" %>
       </td>
     </tr>
   </tbody>

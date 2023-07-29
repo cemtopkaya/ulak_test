@@ -8,4 +8,9 @@ tr:
   text_issue_test_results: Test Sonuçları
   text_git_tag_description_empty: Etiketin açıklamasında üretilen çıktı bilgisine erişilemedi
   text_exception_name: İstisna
+  text_socket_error_occured: Bağlantı İstisnası Oluştu
   text_exception_occured_name: İstisna Oluştu
+  no_associated_code_revision: Henüz kod güncellemesi yapılmamış
+  no_associated_tests: Konuyla ilişkili test yok
+  text_sync_kiwi_tests: Eşleştir
+  button_sync_kiwi_tests: Kiwi Test Senaryolarını Eşleştir

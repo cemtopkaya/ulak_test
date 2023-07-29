@@ -1,6 +1,7 @@
-<div id="kod_surumleri">
+<div id="test_result_kod_surumleri">
 
-  <%= issue.changesets.empty? ? "<em>Henüz kod güncellemesi yapılmamış</em>" : "" %>
+  <%== tests.empty? ? "<p>#{l(:no_associated_tests)}</p>" : "" %>
+  <%== issue.changesets.empty? ? "<p>#{l(:no_associated_code_revision)}</p>" : "" %>
 
   <%
     issue.changesets.each do |changeset| 
@@ -39,9 +40,10 @@
             begin
               tag_info = UlakTest::Git.commit_tags(changeset.repository.url, changeset.identifier) 
             rescue StandartError => e 
-            %>
-              alert('İstisna alındı: ' + <%= e.message %>)
-            <% end %>
+              javascript_tag do %>
+                alert('İstisna alındı: <%= e.message %>');
+            <% end 
+            end %>
             <%= options_for_select(tag_info.map { |tag| ["#{tag[:date]}", tag[:tag]] }) %>
           </select>
           <div class="tests"></div>
@@ -70,7 +72,8 @@
 
     $('[id^="select_tag_revision-"]').select2({
         width:"350px",
-        templateResult: templateTagOption
+        templateResult: templateTagOption,
+        templateSelection: templateTagOption
     }).on('select2:select', function (e) {
       console.log(">>>>> ",e.params.data);
       if(!e.params.data){

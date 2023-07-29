@@ -31,7 +31,7 @@ $NAME_KIWI_TESTS = :ulak_kiwi_test_v1
 $PLUGIN_NAME_KIWI_TESTS = :plugin_ulak_kiwi_test_v1
 
 Redmine::Plugin.register $NAME_KIWI_TESTS do
-  name "Ulak Test"
+  name "Ulak Kiwi Test Plugin"
   author "Cem Topkaya"
   description "Kiwi TCMS integration for Redmine"
   version "1.0.1"
