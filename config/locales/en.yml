@@ -16,7 +16,7 @@ en:
   button_sync_kiwi_tests: Sync Kiwi Test Cases
   label_issue_code_artifacts_tags: Tags
   text_revision_comment: Revision Comment
-  
+
   text_test_run_status_didnt_run_with_artifact: The test case didn't run yet with current artifact
 
   text_test_didnt_run: The test case did not run yet
@@ -26,8 +26,8 @@ en:
   text_test_run_status_running_count: The test case is RUNNING count 
   text_test_run_status_paused: The test case is PAUSED
   text_test_run_status_paused_count: The test case is PAUSED count
-  text_test_run_status_passed: The test case is SKIPPED
-  text_test_run_status_passed_count: The test case is SKIPPED count
+  text_test_run_status_passed: The test case is PASSED
+  text_test_run_status_passed_count: The test case is PASSED count
   text_test_run_status_failed: The test case is FAILED
   text_test_run_status_failed_count: The test case is FAILED count
   text_test_run_status_blocked: The test case is BLOCKED

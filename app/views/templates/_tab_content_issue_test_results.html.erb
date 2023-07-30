@@ -120,6 +120,7 @@
       const changeset_id = $(this).attr("id").split('-')[1]
       const selected_tag = e.params.data.id
       const url = `/<%= $NAME_KIWI_TESTS %>/issues/<%=issue_id%>/tab/test_results/changesets/${changeset_id}/tags?tag=${selected_tag}`
+      const caseRunNoStatusDescriptions = "<%= l(:text_test_run_status_didnt_run_with_artifact) %>"
       $.get( url, function( data ) {
         console.log(">>> TAG seçildi .... ");
         $('div.test_run_list').each(function(idx, div){
@@ -139,26 +140,20 @@
           let $spanTestCase = $li.find('span.test-case');
           // <span> elemanının sınıflarını alın ve dizi olarak kaydedin ("test-case c-pill")
           let classList = $spanTestCase.attr('class').split(' ');
-          // <span> elemanının içindeki test sonuçlarının badge olarak gösteren span'leri seç
-          let $spanTestCaseResults = $spanTestCase.find('span.test-case-result');
 
-          $spanTestCaseResults.each(function(){
-            $stcr = $(this)
-            $stcr.html('');
-
-            // Dizi içindeki sınıfların her birini kontrol edin
-            classList.forEach(function(className) {
-              // Eğer sınıf "c-pill--" ile başlıyorsa, o sınıfı çıkarın
-              if (className == 'test-case-result') {
-                $stcr.html('');
-              }
-
-              if (className.startsWith("c-pill--")) {
-                $spanTestCase.removeClass(className);
-              }
-            });
-          })
+          // c-pill--*** ile başlayan ve eklenmiş olan class isimlerini sil
+          $spanTestCase.removeClass(function(index, className) {
+            // className değişkeni, elemanın tüm sınıflarını içeren bir dizedir
+            // Sınıf adı "c-pill--" ile başlayanları boşlukla birleştir ve silinecek sınıflar olarak dön
+            return (className.match(/\bc-pill--\S+/g) || []).join(' ');
+          });
           
+          // nostatus stilini ayarlayıp, içine badge eklemeden tüm test senaryolarının li içeriğini sıfırlıyoruz
+          $spanTestCase.addClass(`c-pill--nostatus`)
+          $spanTestCase.attr("title", caseRunNoStatusDescriptions);
+
+          // badge olan span elemanlarını kaldıralım, sonradan gerekirse oluşturulur
+          $spanTestCase.find('span.test-case-result').remove()
         });
 
         $(`[id^="select_tag_revision-"]:not(#${select_id})`).each(function(idx, select){
@@ -207,46 +202,90 @@
             return groupedData;
           }
 
-          const arr = createCaseObjectArray()
-          const groupedData = groupByCaseRunStatus(arr)
+          const arrCasesOfAllRuns = createCaseObjectArray()
+          /*
+          groupedData = 
+            {
+              "6":{"idle":1,"running":0,"paused":0,"passed":1,"failed":0,"blocked":0,"error":0,"waived":1},
+              "7":{"idle":0,"running":0,"paused":1,"passed":1,"failed":0,"blocked":0,"error":0,"waived":0},
+              "8":{"idle":0,"running":1,"paused":0,"passed":0,"failed":0,"blocked":0,"error":0,"waived":0},
+              "9":{"idle":0,"running":0,"paused":0,"passed":0,"failed":0,"blocked":1,"error":0,"waived":0},
+              "10":{"idle":0,"running":0,"paused":0,"passed":0,"failed":0,"blocked":0,"error":1,"waived":0},
+              "11":{"idle":0,"running":0,"paused":0,"passed":0,"failed":1,"blocked":0,"error":0,"waived":0},
+              "16":{"idle":1,"running":0,"paused":0,"passed":0,"failed":0,"blocked":0,"error":0,"waived":0},
+              "17":{"idle":0,"running":0,"paused":0,"passed":0,"failed":0,"blocked":0,"error":0,"waived":1}
+            }
+          */
+          const groupedData = groupByCaseRunStatus(arrCasesOfAllRuns)
           <%
             caseRunStatus = ["idle","running","paused","passed","failed","blocked","error","waived"]
             caseRunStatusDescs = caseRunStatus.map { |s| l("text_test_run_status_#{s}".to_sym) }
           %>
           const arrCaseRunStatus = <%== caseRunStatus %>
           console.log(">>>>> arrCaseRunStatus: ",arrCaseRunStatus)
-          const caseRunNoStatusDescriptions = "<%= l(:text_test_run_status_didnt_run_with_artifact) %>"
           const arrCaseRunStatusDescriptions = <%== caseRunStatusDescs %>
           
           $test_case_list.find('li').each((idx, li)=>{
             $li = $(li)
-            $spanTestCase = $li.find('span').eq(0)
+            $spanTestCase = $li.find('span.test-case').eq(0)
             caseId = $li.data('case-id')
-            foundCase = arr.filter(a=>a.case_id == caseId)[0]
+            // caseId = 6 için gruplanmış test sonuçları {"idle":1,"running":0,"paused":0,"passed":1,"failed":0,"blocked":0,"error":0,"waived":1}
+            caseStatuses = groupedData[caseId]
+            /*
+              koşularda bu test senaryosu: 
+              - varsa son koşudaki test sonucuna göre stil verilecek
+              arrCasesOfAllRuns.find(a=>a.case_id == caseId)
+                  {case_id: 6, case_run_status_name: 'waived'}
+              - yoksa "c-pill--nostatus" ile beyaz arka planda 
+              ve içinde <span class="test-case-result ..."> elemanları olmayacak.
+            */
+            liCaseLastStatus = arrCasesOfAllRuns.find(a=>a.case_id == caseId)
+            debugger
 
-            if ( foundCase ) {
-              lastStatusOfCaseRun = foundCase['case_run_status_name']
-              $spanTestCase.addClass(`c-pill--${lastStatusOfCaseRun}`)
-              $spanTestCase.attr("title", arrCaseRunStatusDescriptions[arrCaseRunStatus.indexOf(lastStatusOfCaseRun)]);
-            }else{
-              $spanTestCase.addClass(`c-pill--nostatus`)
-              $spanTestCase.attr("title", caseRunNoStatusDescriptions);
+            if ( !liCaseLastStatus ) {
+              return true; // continue yerine true kullanılır
             }
 
-            for(var status of arrCaseRunStatus) {
-              // <span> elemanının içindeki test sonuçlarının badge olarak gösteren span'leri seç
-              let $spanTestCaseResults = $spanTestCase.find('span.test-case-result');
-              let $spanTestCaseResult = $li.find(`span.test-case-result.${status}`)
-              let val = (groupedData && groupedData[caseId]) ? groupedData[caseId][`${status}`] : ''
-              $spanTestCaseResult.html(val ? val : '')
+            /* 
+               li elemanında görüntülenen test senaryosunun son RUN'da ki sonucu, 
+               badge listesinin en başına koyalım ki float:right yapınca en sonuna geçsin ve okuması kolay olsun
+               li
+                 a
+                 span.test-case
+                   span.test-case-result.passed > 1
+                   span.test-case-result.idle   > 1
+                   span.test-case-result.waived > 1   << lastStatusOfCaseRun değeri waived olsun
+            */
+            lastStatusOfCaseRun = liCaseLastStatus['case_run_status_name']
 
-              testResultStatusClassName = $spanTestCase.attr('class').split(' ').find(cls=>cls.indexOf('--')>0)
-              testResultStatus = testResultStatusClassName.split('--')[1]
-              if(testResultStatus == status) {
-                console.log(">>> testResultStatus == status: ", testResultStatus == status);
-                $spanTestCaseResult.insertBefore($spanTestCaseResults.first());
-              }
+            // c-pill--*** ile başlayan ve eklenmiş olan class isimlerini sil
+            $spanTestCase.removeClass(function(index, className) {
+              // className değişkeni, elemanın tüm sınıflarını içeren bir dizedir
+              // Sınıf adı "c-pill--" ile başlayanları boşlukla birleştir ve silinecek sınıflar olarak dön
+              return (className.match(/\bc-pill--\S+/g) || []).join(' ');
+            });
+
+            // li > span.test-case için son test sonucunun stilini oluşturuyoruz
+            $spanTestCase.addClass(`c-pill--${lastStatusOfCaseRun}`)
+            $spanTestCase.attr("title", arrCaseRunStatusDescriptions[arrCaseRunStatus.indexOf(lastStatusOfCaseRun)]);
+              
+            /* 
+              property bilgilerinin 0'dan farklı değeri olanları için badge elemanlarını ekleyelim:
+                {"idle":1,"running":0,"paused":0,"passed":1,"failed":0,"blocked":0,"error":0,"waived":1}
+            */
+            for (const prop in caseStatuses) {
+              console.log(prop)
+              const statusCountOfTestCase = caseStatuses[prop]
+              const statusTitle = arrCaseRunStatusDescriptions[arrCaseRunStatus.indexOf(prop)]
+              // Eğer test senaryosu için örneğin skipped:0 ise badge oluşturmadan bir sonrakine geç.
+              if(!statusCountOfTestCase) continue
+
+              let $stcr = $(`<span class="test-case-result ${prop}" title="${statusTitle}">${statusCountOfTestCase}</span>`)
+              // Eğer son başarılı test koşusunun durumunu işliyorsak bu badge en başa gelmeli
+              if(lastStatusOfCaseRun == prop) $spanTestCase.find('a').after($stcr);
+              else $spanTestCase.append($stcr)
             }
+
           })
         });
 

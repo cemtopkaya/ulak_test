@@ -24,8 +24,8 @@ tr:
   text_test_run_status_running_count: Test senaryosunun KOŞUYOR olduğu sayı
   text_test_run_status_paused: Test senaryosu DURDURULDU
   text_test_run_status_paused_count: Test senaryosunun DURDURULDUĞU sayı
-  text_test_run_status_passed: Test senaryosu ES GEÇİLDİ
-  text_test_run_status_passed_count: Test senaryosunun ES GEÇİLDİĞİ sayı
+  text_test_run_status_passed: Test senaryosu BAŞARILI
+  text_test_run_status_passed_count: Test senaryosunun BAŞARILI sonuç sayısı
   text_test_run_status_failed: Test senaryosu BAŞARISIZ oldu 
   text_test_run_status_failed_count: Test senaryosunun BAŞARISIZ olduğu sayı
   text_test_run_status_blocked: Test senaryosu ENGELLENMİŞ
