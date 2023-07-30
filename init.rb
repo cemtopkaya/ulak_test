@@ -27,8 +27,8 @@ else
   end
 end
 
-$NAME_KIWI_TESTS = :ulak_kiwi_test_v1
-$PLUGIN_NAME_KIWI_TESTS = :plugin_ulak_kiwi_test_v1
+$NAME_KIWI_TESTS = :ulak_kiwi_test_v1_2
+$PLUGIN_NAME_KIWI_TESTS = "plugin_#{$NAME_KIWI_TESTS}".to_sym
 
 Redmine::Plugin.register $NAME_KIWI_TESTS do
   name "Ulak Kiwi Test Plugin"

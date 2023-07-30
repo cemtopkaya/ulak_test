@@ -2,3 +2,316 @@
     font-size: large;
     color:blue;
 }
+
+h3 > div.left{float: left;}
+h3 > div.right{float: right;}
+
+
+.test_case_list {
+  list-style: none;
+  padding-left: 20px;
+  padding-top: 10px;
+  width: 95%;
+}
+
+.test_case_list > li {
+
+}
+
+.artifact_list {
+    padding: 0;
+    list-style: none;
+}
+
+.artifact_list > li {
+    margin-top: 10px;
+}
+
+.test_run_list { 
+
+}
+
+.test_run_list > li {
+    list-style: none;
+    margin-right: 0px;
+    margin-top: 20px;
+    margin-bottom: 0px;
+    padding: 5px;
+    border-width: 1px 3px 2px 1px;
+    border-style: solid;
+    border-color: #d1d1d7;
+}
+
+.test_result_list {
+    padding-left: 20px;
+}
+
+.test_result_list > li {
+    list-style: none;
+    padding-left: 10px;
+    border-width: 0px 0px 0px 1px;
+    border-style: dotted;
+    border-color: #afafaf;
+    margin-top: 5px;
+}
+
+.test_result_list > li > abbr {
+    display: block;
+    float: left;
+    width: 20px;
+}
+
+/* -------- Test senaryolarının badge hali --------- */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+.c-pill {
+  align-items: center;
+	font-family: "Open Sans", Arial, Verdana, sans-serif;
+	font-weight: bold;
+	font-size: 11px;
+  display: inline-block;
+  height: 100%;
+  white-space: nowrap;
+  width: auto;
+
+  position: relative;
+  border-radius: 100px;
+  overflow: hidden;
+  padding: 0px 12px 0px 20px;
+  text-overflow: ellipsis;
+	line-height: 1.25rem;
+	color: #595959;
+	
+    word-break: break-word;
+
+  &:before {
+    border-radius: 50%;
+    content: '';
+    height: 10px;
+    left: 6px;
+    margin-top: -5px;
+    position: absolute;
+    top: 50%;
+    width: 10px;
+  }
+ 
+}
+
+
+.c-pill--passed {
+  background: #b4eda0; 
+}
+.c-pill--passed:before {
+  content: "done";
+  font-family: "Material Icons";
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  transform: translate(-20%, 0%);
+  color: #6BC167;
+  font-size: 12px;
+  line-height: 1;
+}
+
+
+
+.c-pill--waived {
+  background: #ffebb6; 
+}
+.c-pill--waived:before {
+  background: #e2a115;
+  border-radius: 100px;
+}
+
+.c-pill--running {
+    background: #f5c3ed;
+    position: relative; /* Relative pozisyon belirleme */
+    padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
+    border: 1px solid;
+    animation: changeColor 2s infinite; /* Animasyonu tanımlayın */
+  }
+  
+  .c-pill--running:before {
+    content: "play_arrow";
+    font-family: "Material Icons";
+    transform: translate(-20%, 0%);
+    color: rgb(212, 32, 173);
+    font-size: 12px;
+    line-height: 1;
+    animation: changeColor 2s infinite; /* Animasyonu tanımlayın */
+  }
+
+/* Renk değişimi için animasyon */
+@keyframes changeColor {
+  0% {
+    color: rgb(8 255 0);
+    border-color: rgb(8 255 0);
+  }
+  50% {
+    color: rgb(170, 170, 41);
+    border-color: rgb(170, 170, 41);
+  }
+  100% {
+    color: rgb(0 249 109);
+    border-color: rgb(0 249 109);
+    border-width: 0px;
+  }
+}
+
+.c-pill--blocked {
+  background: #000;
+}
+.c-pill--blocked:before {
+  background: #e3f1e3;
+  border-radius: 3px;
+}
+
+.c-pill--failed {
+  background: #eda0a0;
+  position: relative; /* Relative pozisyon belirleme */
+  padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
+}
+
+.c-pill--failed:before {
+  content: "flight_land";
+  font-family: "Material Icons";
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  transform: translate(-20%, 0%);
+  color: #a11111;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.c-pill--error {
+  background: #efcbcb;
+}
+
+.c-pill--error:before {
+  background: #ff0202;
+  border-radius: 100px;
+}
+
+.c-pill--idle {
+    background: #afafaf;
+    position: relative; /* Relative pozisyon belirleme */
+    padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
+  }
+  
+  .c-pill--idle:before {
+    content: "horizontal_rule";
+    font-family: "Material Icons";
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    transform: translate(-20%, 0%);
+    color: rgb(142, 142, 143);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+.c-pill--paused {
+    background: #d9d8d8;
+    position: relative; /* Relative pozisyon belirleme */
+    padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
+  }
+  
+  .c-pill--paused:before {
+    content: "pause";
+    font-family: "Material Icons";
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    transform: translate(-20%, 0%);
+    color: rgb(131 128 128);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+
+  .c-pill--running {
+    background: #d1d8ff;
+    position: relative; /* Relative pozisyon belirleme */
+    padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
+  }
+  
+  .c-pill--running:before {
+    content: "play_arrow";
+    font-family: "Material Icons";
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    transform: translate(-20%, 0%);
+    color: rgb(54, 124, 255);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+/* ------- TEST SENARYOLARI ICIN Badge  -------- */
+
+.test-case {
+  align-items: center;
+  font-family: "Open Sans", Arial, Verdana, sans-serif;
+  font-weight: bold;
+  font-size: 11px;
+  display: inline-block;
+  height: 100%;
+  white-space: nowrap;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 0px 12px 0px 20px;
+  text-overflow: ellipsis;
+  line-height: 1.25rem;
+  
+  color: #595959;
+  word-break: break-word;
+  
+  padding-right: 0;
+}
+
+.test-case-result {
+    overflow: hidden;
+    margin: 0 0 0 2px;
+    width: 30px;
+    display: block;
+    float: right;
+    text-align: center;
+    height: 100%;
+}
+
+.test-case-result.passed {
+  color: #f5f2f2;
+  background-color: green;
+}
+
+.test-case-result.failed {
+  color: #f5f2f2;
+  background-color: maroon;
+}
+
+.test-case-result.error {
+  color: #f5f2f2;
+  background-color: red;
+}
+
+.test-case-result.blocked {
+  color: #f5f2f2;
+  background-color: black;
+}
+
+.test-case-result.waived {
+  color: #f5f2f2;
+  background-color: gray;
+}
+
+.test-case-result.paused {
+  color: #f5f2f2;
+  background-color: rgb(172, 147, 9);
+}
+
+.test-case-result.running {
+  color: #f5f2f2;
+  background-color: rgb(71, 243, 108);
+}

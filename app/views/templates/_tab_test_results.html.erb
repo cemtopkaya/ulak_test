@@ -2,24 +2,6 @@
   console.log(">>> Test seçcmek için gerekli javascript metotları....");
 </script>
 
-<style>
-ol.cases > li {
-
-}
-
-ol.tests > li {
-    list-style: none;
-    margin: 10px 5px;
-}
-
-ol.runs > li {
-    margin: 20px;
-    border: 1px solid;
-    padding: 5px;
-    list-style: none;
-}
-</style>
-
 <%
  if @edited_artifacts.empty? %>
  <p>
@@ -30,7 +12,7 @@ ol.runs > li {
  else
     kiwi_info = UlakTest::PluginSetting.get_kiwi_settings
 %>
-    <ol class="tests">
+    <ol class="artifact_list">
     <% @edited_artifacts.each do |package| %>
         <li>
             <b><%= package %></b> <br/>
@@ -39,36 +21,48 @@ ol.runs > li {
             package_executions = @kiwi_executions.select { |e| package_run_ids.include?(e["run"]) }
             unless package_executions.empty?
             %>
-            <ol class="runs">
+            <ol class="test_run_list">
                 <% package_run_ids.each do |run_id| %>
                 <li>
                     RUN ID: <a href='<%= "#{kiwi_info[:kiwi_url]}/runs/#{run_id}" %>' _target="_blank"><%= run_id %></a><br>
-                    <ul>
+                    <ul class="test_result_list">
                         <% @kiwi_executions.select { |e| e["run"] == run_id }.each  do |e| %>
-                        <li>
+                        <li data-case-id="<%= e["case"] %>" 
+                            data-case-status="<%= e["status"] %>" 
+                            data-case-status-name="<%= e["status__name"].downcase %>">
                             <% case e["status"]
-                            when 4
-                                status_icon = "✓"
-                            when 8
-                                status_icon = "⚠️"
-                            when 1
+                            when 1 # IDLE
                                 status_icon = "⏳"
-                            when 3
-                                status_icon = "⏸️"
-                            when 2 
+                                status_class = "idle"
+                            when 2 # RUNNING
                                 status_icon = "▶️"
-                            when 6
-                                status_icon = "🚫"
-                            when 7
-                                status_icon = "⚠️"
-                            when 5
+                                status_class = "running"
+                            when 3 # PAUSED
+                                status_icon = "⏸️"
+                                status_class = "paused"
+                            when 4 # PASSED
+                                status_icon = "✓"
+                                status_class = "passed"
+                            when 5 # FAILED
                                 status_icon = "❌"
+                                status_class = "failed"
+                            when 6 # BLOCKED
+                                status_icon = "🚫"
+                                status_class = "blocked"
+                            when 7 # ERROR
+                                status_icon = "⚠️"
+                                status_class = "error"
+                            when 8 # WAIVED > VAZGEÇİLDİ
+                                status_icon = "⚠️"
+                                status_class = "waived"
                             else
                                 status_icon = ""
                             end
                             %>
-                            <abbr title='<%= e["status__name"] %>'> <%= status_icon %></abbr> 
-                            <a href='<%= "#{kiwi_info[:kiwi_url]}/case/#{e["case"]}" %>' _target="_blank"><%= e["case__summary"] %></a>
+                            <!--abbr title='<%= e["status__name"] %>'> <%= status_icon %></abbr--> 
+                            <span class="c-pill c-pill--<%= status_class %>" title="<%= status_class %>">
+                                <a href='<%= "#{kiwi_info[:kiwi_url]}/case/#{e["case"]}" %>' _target="_blank"><%= e["case__summary"] %></a>
+                            </span>
                         </li>
                         <% end %>
                     </ul>

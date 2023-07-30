@@ -1,4 +1,8 @@
-<%= javascript_include_tag 'issue_edit_test.js', :plugin => 'ulak_test' %>
+<%= javascript_include_tag 'issue_edit_test.js', :plugin => $NAME_KIWI_TESTS %>
+
+<%= stylesheet_link_tag 'issue_tests_tab.css', :plugin => $NAME_KIWI_TESTS %>
+<%= stylesheet_link_tag 'https://fonts.googleapis.com/icon?family=Material+Icons' %>
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' %>
 
 <% content_for :p do %>
   <h1>Merhaba Uranüs</h1>
@@ -71,14 +75,15 @@ function initSelect2() {
   });
 }
 
-$(document).ready(function () {
+$(function () {
   if (typeof $.fn.select2 === 'undefined') {
     // select2 kütüphanesi yüklü değil, yükleyin
-    var link = document.createElement('link');
-    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css';
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    document.head.appendChild(link);
+
+    var link3 = document.createElement('link');
+    link3.href = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css';
+    link3.rel = 'stylesheet';
+    link3.type = 'text/css';
+    document.head.appendChild(link3);
 
     var script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js';

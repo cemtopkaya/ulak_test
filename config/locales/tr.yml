@@ -14,3 +14,4 @@ tr:
   no_associated_tests: Konuyla ilişkili test yok
   text_sync_kiwi_tests: Eşleştir
   button_sync_kiwi_tests: Kiwi Test Senaryolarını Eşleştir
+  label_issue_code_artifacts_tags: Etiketler

@@ -14,3 +14,4 @@ en:
   no_associated_tests: No tests related with issue
   text_sync_kiwi_tests: Synchronise
   button_sync_kiwi_tests: Sync Kiwi Test Cases
+  label_issue_code_artifacts_tags: Tags
