@@ -24,7 +24,10 @@
             <ol class="test_run_list">
                 <% package_run_ids.each do |run_id| %>
                 <li>
-                    RUN ID: <a href='<%= "#{kiwi_info[:kiwi_url]}/runs/#{run_id}" %>' _target="_blank"><%= run_id %></a><br>
+                    <%
+                        run = @kiwi_runs.find{ |f| f["id"] == run_id }
+                    %>
+                    RUN ID: <a href='<%= "#{kiwi_info[:kiwi_url]}/runs/#{run_id}" %>' _target="_blank" title="<%=run["start_date"] %> - <%=run["end_date"] %>"><%= run_id %></a><br>
                     <ul class="test_result_list">
                         <% @kiwi_executions.select { |e| e["run"] == run_id }.each  do |e| %>
                         <li data-case-id="<%= e["case"] %>" 

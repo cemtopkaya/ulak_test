@@ -39,7 +39,7 @@
               <%= format_changeset_comments changeset %>
             </blockquote>
           </div>
-          <div class="wiki changeset-comments">
+          <div class="wiki changeset-comments gorevler">
             <% unless tests.empty? %>
               <b><%= l(:field_issue_tests) %> :</b><br/>
               <ol class="test_case_list">
@@ -240,7 +240,6 @@
               ve içinde <span class="test-case-result ..."> elemanları olmayacak.
             */
             liCaseLastStatus = arrCasesOfAllRuns.find(a=>a.case_id == caseId)
-            debugger
 
             if ( !liCaseLastStatus ) {
               return true; // continue yerine true kullanılır

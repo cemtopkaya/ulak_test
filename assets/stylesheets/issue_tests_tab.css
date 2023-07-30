@@ -27,11 +27,28 @@ h3 > div.right{float: right;}
     margin-top: 10px;
 }
 
+.gorevler{
+  background-color: #e5eaef;
+  padding: 10px;
+  padding-right: 30px;
+  height: auto;
+  border: outset;
+  background-color: white;
+  
+    margin-right: 0px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-width: 1px 3px 2px 1px;
+    border-style: solid;
+    border-color: #d1d1d7;
+}
+
 .test_run_list { 
 
 }
 
 .test_run_list > li {
+    background-color: white;
     list-style: none;
     margin-right: 0px;
     margin-top: 20px;
@@ -99,7 +116,7 @@ h3 > div.right{float: right;}
 
 
 .c-pill--nostatus {
-  background: #fff; 
+  background: #e4ecf8;
 }
 .c-pill--nostatus:before {
   content: '\f059';
