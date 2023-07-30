@@ -33,23 +33,28 @@
       </h3>
       <div id="div_revision-<%= changeset.id %>" class="splitcontent" style="background-color:#e5eaef">
         <div class="splitcontentleft">
-          <div class="wiki changeset-comments"><%= format_changeset_comments changeset %></div>
+          <div class="wiki changeset-comments">
+            <b><%= l(:text_revision_comment) %> :</b><br/>
+            <blockquote>
+              <%= format_changeset_comments changeset %>
+            </blockquote>
+          </div>
           <div class="wiki changeset-comments">
             <% unless tests.empty? %>
               <b><%= l(:field_issue_tests) %> :</b><br/>
               <ol class="test_case_list">
                 <% tests.each do |test| %>
                   <li data-case-id="<%= test.test_case_id %>">
-                    <span class="test-case c-pill" title="">
+                    <span class="test-case c-pill c-pill--nostatus" title="<%= l(:text_test_run_status_didnt_run_with_artifact) %>">
                         <a href='<%= "#{kiwi_info[:kiwi_url]}/case/#{test.test_case_id}" %>' _target="_blank"><%= test.summary %></a>
-                        <span class="test-case-result idle"></span>
-                        <span class="test-case-result running"></span>
-                        <span class="test-case-result paused"></span>
-                        <span class="test-case-result passed"></span>
-                        <span class="test-case-result failed"></span>
-                        <span class="test-case-result blocked"></span>
-                        <span class="test-case-result error"></span>
-                        <span class="test-case-result waived"></span>
+                        <span class="test-case-result idle"     title="<%= l(:text_test_run_status_idle_count) %>"    ></span>
+                        <span class="test-case-result running"  title="<%= l(:text_test_run_status_running_count) %>" ></span>
+                        <span class="test-case-result paused"   title="<%= l(:text_test_run_status_paused_count) %>"  ></span>
+                        <span class="test-case-result passed"   title="<%= l(:text_test_run_status_passed_count) %>"  ></span>
+                        <span class="test-case-result failed"   title="<%= l(:text_test_run_status_failed_count) %>"  ></span>
+                        <span class="test-case-result blocked"  title="<%= l(:text_test_run_status_blocked_count) %>" ></span>
+                        <span class="test-case-result error"    title="<%= l(:text_test_run_status_error_count) %>"   ></span>
+                        <span class="test-case-result waived"   title="<%= l(:text_test_run_status_waived_count) %>"  ></span>
                     </span>
                   </li>
                 <% end %>
@@ -109,43 +114,59 @@
         return console.log(">>>>> Dolu bir seçenek seçilmedi!");
       }
       const $select = $(this)
+      const $div_revision = $select.parents('[id^="div_revision-"]')
+      const $test_case_list = $div_revision.find(".test_case_list")
       const select_id = this.id
       const changeset_id = $(this).attr("id").split('-')[1]
       const selected_tag = e.params.data.id
       const url = `/<%= $NAME_KIWI_TESTS %>/issues/<%=issue_id%>/tab/test_results/changesets/${changeset_id}/tags?tag=${selected_tag}`
       $.get( url, function( data ) {
         console.log(">>> TAG seçildi .... ");
-        $("div.test_run_list").each(function(idx, div){
+        $('div.test_run_list').each(function(idx, div){
           $(div).html('')
         })
 
+        // <ol class="test_case_list">
+        //   <li data-case-id="6">
+        //     <span class="test-case c-pill" title="...>
+        //       <a href="https://kiwi-test....>TC - 002- Periyodik Kayıtlanma</a>
+        //       <span class="test-case-result idle"....
+        //       <span class="test-case-result running"....
         // ".test_case_list" içindeki tüm <li> elemanlarını seçin ve bir döngüye sokun
-        $(".test_case_list li").each(function() {
-          // <li> elemanı içindeki <span> elemanını seçin
-          var spanElement = $(this).find("span");
+        $test_case_list.find('li').each(function() {
+          let $li = $(this)
+          // <li> elemanı içindeki <span class="test-case c-pill" title="Test senaryosu koşusundan VAZGEÇİLDİ"> elemanını seçin
+          let $spanTestCase = $li.find('span.test-case');
+          // <span> elemanının sınıflarını alın ve dizi olarak kaydedin ("test-case c-pill")
+          let classList = $spanTestCase.attr('class').split(' ');
+          // <span> elemanının içindeki test sonuçlarının badge olarak gösteren span'leri seç
+          let $spanTestCaseResults = $spanTestCase.find('span.test-case-result');
+
+          $spanTestCaseResults.each(function(){
+            $stcr = $(this)
+            $stcr.html('');
+
+            // Dizi içindeki sınıfların her birini kontrol edin
+            classList.forEach(function(className) {
+              // Eğer sınıf "c-pill--" ile başlıyorsa, o sınıfı çıkarın
+              if (className == 'test-case-result') {
+                $stcr.html('');
+              }
+
+              if (className.startsWith("c-pill--")) {
+                $spanTestCase.removeClass(className);
+              }
+            });
+          })
           
-          // <span> elemanının sınıflarını alın ve dizi olarak kaydedin
-          var classList = spanElement.attr("class").split(" ");
-
-          // Dizi içindeki sınıfların her birini kontrol edin
-          classList.forEach(function(className) {
-            // Eğer sınıf "c-pill--" ile başlıyorsa, o sınıfı çıkarın
-            if (className == 'test-case-result') {
-              spanElement.html('');
-            }
-
-            if (className.startsWith("c-pill--")) {
-              spanElement.removeClass(className);
-            }
-          });
         });
 
         $(`[id^="select_tag_revision-"]:not(#${select_id})`).each(function(idx, select){
-          $(select).val("").trigger("change");
+          $(select).val('').trigger('change');
         })
 
-        $ph_test_result = $select.parent().find("div.test_result_placeholder")
-        $ph_test_result && $ph_test_result.hide().html( data ).slideDown( "slow", function() {
+        $ph_test_result = $select.parent().find('div.test_result_placeholder')
+        $ph_test_result && $ph_test_result.hide().html( data ).slideDown( 'slow', function() {
 
           const createCaseObjectArray = function(){
             result = []
@@ -182,27 +203,49 @@
               // İlgili 'case_run_status_name' alanını artırın
               groupedData[case_id][case_run_status_name]++;
             });
+
             return groupedData;
           }
 
           const arr = createCaseObjectArray()
           const groupedData = groupByCaseRunStatus(arr)
-
-          const arrCaseRunStatus = ["idle","running","paused","passed","failed","blocked","error","waived"]
-          $(".test_case_list li").each((idx, li)=>{
-
+          <%
+            caseRunStatus = ["idle","running","paused","passed","failed","blocked","error","waived"]
+            caseRunStatusDescs = caseRunStatus.map { |s| l("text_test_run_status_#{s}".to_sym) }
+          %>
+          const arrCaseRunStatus = <%== caseRunStatus %>
+          console.log(">>>>> arrCaseRunStatus: ",arrCaseRunStatus)
+          const caseRunNoStatusDescriptions = "<%= l(:text_test_run_status_didnt_run_with_artifact) %>"
+          const arrCaseRunStatusDescriptions = <%== caseRunStatusDescs %>
+          
+          $test_case_list.find('li').each((idx, li)=>{
             $li = $(li)
-            case_id = $li.data("case-id")
-            foundCase = arr.filter(a=>a.case_id == case_id)[0]
+            $spanTestCase = $li.find('span').eq(0)
+            caseId = $li.data('case-id')
+            foundCase = arr.filter(a=>a.case_id == caseId)[0]
+
             if ( foundCase ) {
-              lastStatusOfCaseRun = foundCase["case_run_status_name"]
-              $li.find("span").eq(0).addClass(`c-pill--${lastStatusOfCaseRun}`)
+              lastStatusOfCaseRun = foundCase['case_run_status_name']
+              $spanTestCase.addClass(`c-pill--${lastStatusOfCaseRun}`)
+              $spanTestCase.attr("title", arrCaseRunStatusDescriptions[arrCaseRunStatus.indexOf(lastStatusOfCaseRun)]);
+            }else{
+              $spanTestCase.addClass(`c-pill--nostatus`)
+              $spanTestCase.attr("title", caseRunNoStatusDescriptions);
             }
 
             for(var status of arrCaseRunStatus) {
-              $span = $li.find(`.test-case-result.${status}`)
-              let val = (groupedData && groupedData[case_id]) ? groupedData[case_id][`${status}`] : ''
-              $span.html(val ? val : '')
+              // <span> elemanının içindeki test sonuçlarının badge olarak gösteren span'leri seç
+              let $spanTestCaseResults = $spanTestCase.find('span.test-case-result');
+              let $spanTestCaseResult = $li.find(`span.test-case-result.${status}`)
+              let val = (groupedData && groupedData[caseId]) ? groupedData[caseId][`${status}`] : ''
+              $spanTestCaseResult.html(val ? val : '')
+
+              testResultStatusClassName = $spanTestCase.attr('class').split(' ').find(cls=>cls.indexOf('--')>0)
+              testResultStatus = testResultStatusClassName.split('--')[1]
+              if(testResultStatus == status) {
+                console.log(">>> testResultStatus == status: ", testResultStatus == status);
+                $spanTestCaseResult.insertBefore($spanTestCaseResults.first());
+              }
             }
           })
         });
@@ -210,8 +253,6 @@
       });
     });
 
-    $( "#test_result_kod_surumleri" ).accordion({
-      heightStyle: "content"
-    });
+    $('#test_result_kod_surumleri').accordion({ heightStyle: "content" });
   });
 </script>

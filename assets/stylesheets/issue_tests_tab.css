@@ -98,6 +98,19 @@ h3 > div.right{float: right;}
 }
 
 
+.c-pill--nostatus {
+  background: #fff; 
+}
+.c-pill--nostatus:before {
+  content: '\f059';
+  font-family: "Font Awesome 5 Free";
+  transform: translate(-20%, 0%);
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1;
+}
+
+
 .c-pill--passed {
   background: #b4eda0; 
 }
@@ -145,16 +158,12 @@ h3 > div.right{float: right;}
 @keyframes changeColor {
   0% {
     color: rgb(8 255 0);
-    border-color: rgb(8 255 0);
   }
   50% {
-    color: rgb(170, 170, 41);
-    border-color: rgb(170, 170, 41);
+    color: #fff;
   }
   100% {
-    color: rgb(0 249 109);
-    border-color: rgb(0 249 109);
-    border-width: 0px;
+    color: rgb(8 255 0);
   }
 }
 
@@ -194,7 +203,7 @@ h3 > div.right{float: right;}
 }
 
 .c-pill--idle {
-    background: #afafaf;
+    background: #d4f7e9;
     position: relative; /* Relative pozisyon belirleme */
     padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
   }
@@ -206,7 +215,7 @@ h3 > div.right{float: right;}
     top: 50%;
     left: 6px;
     transform: translate(-20%, 0%);
-    color: rgb(142, 142, 143);
+    color: #21f39f;
     font-size: 12px;
     line-height: 1;
   }
@@ -231,7 +240,7 @@ h3 > div.right{float: right;}
 
 
   .c-pill--running {
-    background: #d1d8ff;
+    background: #c9f2c9;
     position: relative; /* Relative pozisyon belirleme */
     padding-left: 20px; /* Soldan boşluk ekleyerek çarpıya alan ayırma */
   }
@@ -283,7 +292,12 @@ h3 > div.right{float: right;}
 
 .test-case-result.passed {
   color: #f5f2f2;
-  background-color: green;
+  background-color: rgb(131 128 128);
+}
+
+.test-case-result.idle {
+  color: #000;
+  background-color: #01f795;
 }
 
 .test-case-result.failed {
@@ -298,20 +312,34 @@ h3 > div.right{float: right;}
 
 .test-case-result.blocked {
   color: #f5f2f2;
-  background-color: black;
+  background-color: #e3f1e3;
+  color: black;
 }
 
 .test-case-result.waived {
   color: #f5f2f2;
-  background-color: gray;
+  background-color: #e2a115;
 }
 
 .test-case-result.paused {
   color: #f5f2f2;
-  background-color: rgb(172, 147, 9);
+  background-color: #808080;
 }
 
 .test-case-result.running {
   color: #f5f2f2;
   background-color: rgb(71, 243, 108);
+  animation: changeColorTestCaseResultBadge 2s infinite; /* Animasyonu tanımlayın */
+}
+/* Renk değişimi için animasyon */
+@keyframes changeColorTestCaseResultBadge {
+  0% {
+    background-color: rgb(8 255 0);
+  }
+  50% {
+    background-color: green;
+  }
+  100% {
+    background-color: rgb(8 255 0);
+  }
 }
