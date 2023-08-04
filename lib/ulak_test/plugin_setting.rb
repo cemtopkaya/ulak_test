@@ -25,10 +25,10 @@ module UlakTest
               username: rest_api_username,
               password: rest_api_password,
             }
-          end
+        end
 
-          def self.apply_new_settings
-            @kiwi_settings = nil
-          end
+        def self.apply_new_settings
+          @kiwi_settings = nil
+        end
     end
 end
