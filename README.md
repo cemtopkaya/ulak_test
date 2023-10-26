@@ -42,3 +42,9 @@ distros:
 ![image](https://github.com/cemtopkaya/ulak_test/assets/261946/c69b5381-2bbe-4849-bf79-6167022db950)
 
 ![image](https://github.com/cemtopkaya/ulak_test/assets/261946/7addb947-4824-4559-be48-b009902303ca)
+
+
+## v2 Changed From Test Cases To Test Plans
+![image](https://github.com/cemtopkaya/ulak_test/assets/261946/632f8b75-0722-4ec2-bf71-edb5a7b2cb94)
+
+![image](https://github.com/cemtopkaya/ulak_test/assets/261946/55ffa1b6-09c9-40a7-aad0-4a22c901bb97)
